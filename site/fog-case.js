@@ -4,12 +4,12 @@
  const states=new Map(videos.map(v=>[v,{visible:false,userPaused:false,systemPause:false}]));
  function syncVideos(){for(const v of videos){
   const s=states.get(v),blocked=!s.visible||document.hidden||!!document.querySelector('dialog[open]');
-  if(blocked||reduced.matches||s.userPaused){if(!v.paused){s.systemPause=true;v.pause();}}
+  if(blocked||reduced.matches||navigator.connection?.saveData||s.userPaused){if(!v.paused){s.systemPause=true;v.pause();}}
   else v.play().catch(()=>{});
  }}
  const videoObserver=new IntersectionObserver(entries=>{
   for(const entry of entries){const v=entry.target;states.get(v).visible=entry.isIntersecting;
-   if(entry.isIntersecting&&v.dataset.src){v.src=v.dataset.src;delete v.dataset.src;v.load();}
+   if(entry.isIntersecting&&v.dataset.src){window.PortfolioMedia.load(v);}
   }syncVideos();
  },{threshold:.25});
  videos.forEach(v=>{v.muted=true;videoObserver.observe(v);

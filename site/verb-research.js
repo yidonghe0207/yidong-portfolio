@@ -33,12 +33,12 @@
  dialog.addEventListener('close',()=>{document.body.style.overflow=previousOverflow;opener?.focus({preventScroll:true});});
  window.addEventListener('portfolio:depart',()=>{if(dialog.open)dialog.close();});
  const video=document.querySelector('.research-demo-video'),reduced=matchMedia('(prefers-reduced-motion: reduce)');
- let visible=false,wantsPlay=!reduced.matches,managedPause=false,departing=false;
+ let visible=false,wantsPlay=!reduced.matches&&!navigator.connection?.saveData,managedPause=false,departing=false;
  if(reduced.matches){video.removeAttribute('autoplay');video.pause();}
  function sync(){if(visible&&wantsPlay&&!document.hidden&&!departing&&!document.querySelector('dialog[open]'))video.play().catch(()=>{});else if(!video.paused){managedPause=true;video.pause();}}
  video.addEventListener('pause',()=>{if(managedPause)managedPause=false;else wantsPlay=false;});
  video.addEventListener('play',()=>{wantsPlay=true;sync();});
- new IntersectionObserver(entries=>{visible=entries[0].isIntersecting;sync();},{threshold:.2}).observe(video);
+ new IntersectionObserver(entries=>{visible=entries[0].isIntersecting;if(visible)window.PortfolioMedia?.load(video);sync();},{threshold:.2}).observe(video);
  const observer=new MutationObserver(sync);document.querySelectorAll('dialog').forEach(d=>observer.observe(d,{attributes:true,attributeFilter:['open']}));
  document.addEventListener('visibilitychange',sync);reduced.addEventListener('change',()=>{wantsPlay=!reduced.matches;sync();});
  window.addEventListener('portfolio:depart',()=>{departing=true;sync();});window.addEventListener('pageshow',()=>{departing=false;sync();});

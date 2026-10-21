@@ -2,7 +2,7 @@
  const modal=document.querySelector('.recording-dialog'),stage=modal.querySelector('.recording-stage'),title=modal.querySelector('h2');
  const reel=document.querySelector('#highlight-reel'),tryLink=modal.querySelector('.recording-try');let opener,previousOverflow='';
  const reduced=matchMedia('(prefers-reduced-motion: reduce)');
- let wantsPlayback=!reduced.matches,inView=true,managedPause=false,departing=false;
+ let wantsPlayback=!reduced.matches&&!navigator.connection?.saveData,inView=false,managedPause=false,departing=false;
  if(reduced.matches){reel.removeAttribute('autoplay');reel.pause();}
  function pauseReel(){if(!reel.paused){managedPause=true;reel.pause();}}
  function syncReel(){
@@ -11,7 +11,7 @@
  }
  reel.addEventListener('pause',()=>{if(managedPause)managedPause=false;else wantsPlayback=false;});
  reel.addEventListener('play',()=>{wantsPlayback=true;if(!inView||document.hidden||document.querySelector('dialog[open]')||departing)pauseReel();});
- new IntersectionObserver(entries=>{inView=entries[0].isIntersecting;syncReel();},{threshold:.15}).observe(reel);
+ new IntersectionObserver(entries=>{inView=entries[0].isIntersecting;if(inView)window.PortfolioMedia?.load(reel);syncReel();},{threshold:.15}).observe(reel);
  reduced.addEventListener('change',()=>{wantsPlayback=!reduced.matches;syncReel();});
  const info=document.querySelector('.info-dialog');
  new MutationObserver(syncReel).observe(info,{attributes:true,attributeFilter:['open']});
@@ -22,7 +22,7 @@
   tryLink.hidden=true;tryLink.removeAttribute('href');
   if(button.dataset.video){
    title.textContent=button.dataset.title;
-   const video=document.createElement('video');video.controls=true;video.playsInline=true;video.src=button.dataset.video;stage.replaceChildren(video);
+   const video=document.createElement('video');video.controls=true;video.playsInline=true;video.src=window.PortfolioMedia?.source(button.dataset.video)||button.dataset.video;stage.replaceChildren(video);
    if(button.dataset.tryUrl){const external=button.dataset.tryExternal==='true';tryLink.href=button.dataset.tryUrl;tryLink.dataset.external=String(external);tryLink.dataset.title=button.dataset.title;tryLink.textContent=(external?'Open in Figma':'Try it')+' ↗';tryLink.setAttribute('aria-label',(external?'Open in Figma: ':'Try ')+button.dataset.title);tryLink.hidden=false;}
    if(!modal.open)modal.showModal();video.play().catch(()=>{});
   }else{
