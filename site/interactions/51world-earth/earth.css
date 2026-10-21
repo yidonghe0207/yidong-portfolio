@@ -1,0 +1,68 @@
+.world-demo { color-scheme: light; background: #fff; width: 100%; height: 100svh; margin: 0; }
+.world-stage, .world-stage * { box-sizing: border-box; }
+.world-stage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  min-height: 240px;
+  overflow: hidden;
+  isolation: isolate;
+  background: #fff;
+}
+.world-earth {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  opacity: 0;
+  transform: scale(1.025);
+  transition: opacity 700ms cubic-bezier(.22, 1, .36, 1), transform 1400ms cubic-bezier(.22, 1, .36, 1);
+  pointer-events: none;
+  user-select: none;
+}
+.world-logo {
+  position: relative;
+  display: block;
+  width: clamp(88px, min(11vw, 18vh), 220px);
+  aspect-ratio: 1;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+.world-logo svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.world-disc { fill: #373735; transition: fill 700ms cubic-bezier(.22, 1, .36, 1); }
+.world-logo:focus { outline: none; }
+.world-logo:focus-visible { outline: 2px solid #fff; outline-offset: 10px; }
+.world-stage[data-active="true"] .world-earth { opacity: 1; transform: scale(1); }
+.world-stage[data-active="true"] .world-disc { fill: #fff; }
+.world-stage[data-active="false"] .world-logo:focus-visible { outline-color: #373735; }
+.world-stage .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+.cover-51world.world-stage { min-height: 0; }
+.cover-51world .world-logo { width: 11%; min-width: 44px; max-width: 150px; }
+.work-tile[data-id="51world"] { cursor: pointer; }
+.work-tile[data-id="51world"]:focus-visible { outline: 2px solid var(--page-text); outline-offset: 6px; }
+/* Keep the mask and Earth aligned despite the portfolio's generic image zoom. */
+.cover-51world.world-stage .world-earth { transform: scale(1.025); }
+.cover-51world.world-stage[data-active="true"] .world-earth { transform: scale(1); }
+@media (prefers-reduced-motion: reduce) {
+  .world-earth, .world-disc { transition: none; transform: none; }
+  .cover-51world.world-stage .world-earth { transform: none; }
+}

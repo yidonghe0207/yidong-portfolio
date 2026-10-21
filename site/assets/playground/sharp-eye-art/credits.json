@@ -1,0 +1,138 @@
+{
+  "source": "Harvard Art Museums via Sharp Eye public artwork endpoint",
+  "selection": "Nine images chosen from a randomly returned batch of paintings",
+  "artworks": [
+    {
+      "id": 299993,
+      "title": "Mother and Child",
+      "artists": [
+        {
+          "name": "Pablo Ruiz Picasso",
+          "role": "Artist",
+          "culture": "Spanish"
+        }
+      ],
+      "dated": "c. 1901",
+      "culture": "Spanish",
+      "url": "https://www.harvardartmuseums.org/collections/object/299993",
+      "image": "https://nrs.harvard.edu/urn-3:HUAM:DDC231461_dynmc",
+      "creditline": "Harvard Art Museums/Fogg Museum, Bequest from the Collection of Maurice Wertheim, Class of 1906"
+    },
+    {
+      "id": 230114,
+      "title": "Still Life with Roses",
+      "artists": [
+        {
+          "name": "Pierre-Auguste Renoir",
+          "role": "Artist",
+          "culture": "French"
+        }
+      ],
+      "dated": "c. 1866",
+      "culture": "French",
+      "url": "https://www.harvardartmuseums.org/collections/object/230114",
+      "image": "https://nrs.harvard.edu/urn-3:HUAM:30121_dynmc",
+      "creditline": "Harvard Art Museums/Fogg Museum, Bequest of Grenville L. Winthrop"
+    },
+    {
+      "id": 216394,
+      "title": "Prince with Falcon and Attendants",
+      "artists": [],
+      "dated": "18th century",
+      "culture": "Indian",
+      "url": "https://www.harvardartmuseums.org/collections/object/216394",
+      "image": "https://nrs.harvard.edu/urn-3:HUAM:DDC107005_dynmc",
+      "creditline": "Harvard Art Museums/Arthur M. Sackler Museum, Francis H. Burr Memorial Fund"
+    },
+    {
+      "id": 230051,
+      "title": "Riva degli Schiavoni and Doge's Palace, Venice",
+      "artists": [
+        {
+          "name": "James G. Holland",
+          "role": "Artist",
+          "culture": "British"
+        }
+      ],
+      "dated": "19th century",
+      "culture": "British",
+      "url": "https://www.harvardartmuseums.org/collections/object/230051",
+      "image": "https://nrs.harvard.edu/urn-3:HUAM:DDC254563_dynmc",
+      "creditline": "Harvard Art Museums/Fogg Museum, Bequest of Grenville L. Winthrop"
+    },
+    {
+      "id": 356429,
+      "title": "Still Life with Fruit and Chestnuts",
+      "artists": [
+        {
+          "name": "Cornelis de Heem",
+          "role": "Artist",
+          "culture": "Dutch"
+        }
+      ],
+      "dated": "c. 1655-65",
+      "culture": "Dutch",
+      "url": "https://www.harvardartmuseums.org/collections/object/356429",
+      "image": "https://nrs.harvard.edu/urn-3:HUAM:764411",
+      "creditline": "Harvard Art Museums/Fogg Museum, Gift of Peter and Anne Brooke"
+    },
+    {
+      "id": 231312,
+      "title": "Granada",
+      "artists": [
+        {
+          "name": "Denman Waldo Ross",
+          "role": "Artist",
+          "culture": "American"
+        }
+      ],
+      "dated": "1895",
+      "culture": "American",
+      "url": "https://www.harvardartmuseums.org/collections/object/231312",
+      "image": "https://nrs.harvard.edu/urn-3:HUAM:INV013888_dynmc",
+      "creditline": "Harvard Art Museums/Fogg Museum, Bequest of Denman W. Ross, Class of 1875"
+    },
+    {
+      "id": 226272,
+      "title": "Sacred Grove",
+      "artists": [],
+      "dated": "19th century",
+      "culture": "German",
+      "url": "https://www.harvardartmuseums.org/collections/object/226272",
+      "image": "https://nrs.harvard.edu/urn-3:HUAM:78149_dynmc",
+      "creditline": "Harvard Art Museums/Busch-Reisinger Museum, Gift of"
+    },
+    {
+      "id": 31169,
+      "title": "A Sketch in Kauterskill Clove",
+      "artists": [
+        {
+          "name": "Sanford Robinson Gifford",
+          "role": "Artist",
+          "culture": "American"
+        }
+      ],
+      "dated": "c. 1861",
+      "culture": "American",
+      "url": "https://www.harvardartmuseums.org/collections/object/31169",
+      "image": "https://nrs.harvard.edu/urn-3:HUAM:DDC100528_dynmc",
+      "creditline": "Harvard Art Museums/Fogg Museum, Gift of Sanford Gifford, M.D."
+    },
+    {
+      "id": 229643,
+      "title": "Tulip Tree Flowers",
+      "artists": [
+        {
+          "name": "Childe Hassam",
+          "role": "Artist",
+          "culture": "American"
+        }
+      ],
+      "dated": "1930",
+      "culture": "American",
+      "url": "https://www.harvardartmuseums.org/collections/object/229643",
+      "image": "https://nrs.harvard.edu/urn-3:HUAM:795331",
+      "creditline": "Harvard Art Museums/Fogg Museum, Bequest of Grenville L. Winthrop"
+    }
+  ]
+}

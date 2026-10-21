@@ -1,0 +1,14 @@
+/* A self-contained artwork; its black canvas is independent of the site theme. */
+@font-face{font-family:'Inter Variable';src:url('fonts/Inter-Variable.ttf') format('truetype');font-weight:100 900;font-style:normal;font-display:swap}
+.bytedance-stage{position:relative;display:grid;place-items:center;width:100%;height:100%;background:#000;isolation:isolate;overflow:hidden;container-type:inline-size}
+.bytedance-trigger{position:relative;display:block;width:12%;min-width:92px;max-width:250px;aspect-ratio:470/407;border:0;padding:0;background:transparent;color:#fff;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;isolation:isolate}
+.bytedance-trigger:focus-visible{outline:1px solid #ffffff80;outline-offset:24px;border-radius:2px}
+.bytedance-trigger svg{display:block;width:100%;height:100%;overflow:visible}
+.bytedance-trigger canvas{position:absolute;left:50%;top:50%;width:213.3333%;height:auto;aspect-ratio:1;transform:translate(-50%,-50%);pointer-events:none}
+.bytedance-stage .bytedance-hint{position:absolute;bottom:28px;left:20px;right:20px;margin:0;color:#73737b;text-align:center;font:11px/1.5 var(--sans,Arial,sans-serif);letter-spacing:.045em;pointer-events:none}
+.cover-bytedance .bytedance-trigger{width:17%;min-width:54px;max-width:150px}
+.bytedance-demo{--sans:'Inter Variable',Arial,sans-serif;margin:0;background:#000;overflow:hidden}
+.bytedance-demo main{height:100svh;min-height:280px}
+.bytedance-demo .bytedance-hint{opacity:0;transition:opacity .5s}
+.bytedance-demo:has(.bytedance-stage:hover) .bytedance-hint,.bytedance-demo:has(.bytedance-trigger:focus-visible) .bytedance-hint,.bytedance-demo:has([aria-pressed=true]) .bytedance-hint{opacity:1}
+@media(prefers-reduced-motion:reduce){.bytedance-demo .bytedance-hint{transition:none}}

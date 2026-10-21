@@ -1,0 +1,63 @@
+@font-face{font-family:'Instrument Serif';src:url('fonts/InstrumentSerif-Regular.ttf') format('truetype');font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:'Instrument Serif';src:url('fonts/InstrumentSerif-Italic.ttf') format('truetype');font-weight:400;font-style:italic;font-display:swap}
+@font-face{font-family:'Newsreader';src:url('fonts/Newsreader[opsz,wght].ttf') format('truetype');font-weight:200 800;font-style:normal;font-display:swap}
+@font-face{font-family:'Newsreader';src:url('fonts/Newsreader-Italic[opsz,wght].ttf') format('truetype');font-weight:200 800;font-style:italic;font-display:swap}
+@font-face{font-family:'Fraunces';src:url('fonts/Fraunces[SOFT,WONK,opsz,wght].ttf') format('truetype');font-weight:100 900;font-style:normal;font-display:swap}
+@font-face{font-family:'Fraunces';src:url('fonts/Fraunces-Italic[SOFT,WONK,opsz,wght].ttf') format('truetype');font-weight:100 900;font-style:italic;font-display:swap}
+:root{--serif:'Instrument Serif',Georgia,serif;--display-size:clamp(48px,4.7vw,76px);--display-weight:400;--display-tracking:-.025em}
+:root[data-type=newsreader]{--serif:'Newsreader',Georgia,serif;--display-size:clamp(43px,4.1vw,67px);--display-weight:350;--display-tracking:-.045em}
+:root[data-type=fraunces]{--serif:'Fraunces',Georgia,serif;--display-size:clamp(42px,4.15vw,68px);--display-weight:350;--display-tracking:-.05em}
+.introduction h1{font-family:var(--serif);font-size:var(--display-size);font-weight:var(--display-weight);letter-spacing:var(--display-tracking);line-height:1.08;font-optical-sizing:auto;font-synthesis:none}
+[data-type=fraunces] .introduction h1{font-variation-settings:'SOFT' 0,'WONK' 0,'opsz' 96}
+.second-line{font-size:.88em;margin-top:12px}
+#phrase{font-family:inherit;font-weight:var(--display-weight);font-style:italic;letter-spacing:-.025em}
+.pixel-name>span{color:inherit}.pixel-name>canvas{display:none}
+.intro-bio{margin-top:27px;max-width:420px}
+/* Floating glass bar: translucent body, blurred backdrop, curved edge highlights. */
+.site-header,.project-page .site-header{position:fixed;inset:16px 24px auto;z-index:90;width:min(1040px,calc(100% - 48px));height:58px;margin:0 auto;padding:0 22px;display:flex;align-items:center;justify-content:space-between;mix-blend-mode:normal;isolation:isolate;border:1px solid #ffffff24;border-radius:18px;color:#f6f5f2;background:linear-gradient(135deg,#ffffff0c,#ffffff02 42%,#ffffff09),#1b1b1b70;backdrop-filter:blur(22px) saturate(170%);-webkit-backdrop-filter:blur(22px) saturate(170%);box-shadow:inset 0 1px 0 #ffffff2e,inset 0 -1px 0 #ffffff0e,0 8px 30px #0003;transition:background .3s,box-shadow .3s}
+.site-header::before{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:-1;background:radial-gradient(ellipse 180px 70px at var(--glass-x,30%) 0%,#ffffff18,transparent 90%);transition:opacity .3s}
+.site-header::after{content:'';position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;border-top:1px solid #ffffff35;border-bottom:1px solid #ffffff12;mask-image:linear-gradient(110deg,#000,transparent 35%,#000 80%)}
+.site-header.is-scrolled{background:linear-gradient(135deg,#ffffff0b,#ffffff02),#151515a8;box-shadow:inset 0 1px 0 #ffffff35,0 8px 30px #0005}
+.site-header nav{position:absolute;top:50%;left:50%;right:auto;transform:translate(-50%,-50%);gap:6px;align-items:center;font-size:11px;white-space:nowrap}
+.site-header nav a,.site-header nav button{padding:10px 12px;border-radius:9px;opacity:.85;transition:background .2s,opacity .2s;line-height:1.25}
+.site-header nav a:hover,.site-header nav button:hover{opacity:1;text-decoration:none;background:#ffffff10}
+.site-header nav a::after,.site-header nav button::after{inset:0}
+.site-header .wordmark{font-size:13px;letter-spacing:-.035em}.header-practice{font-size:9px;color:#c1c1bd}
+.project-page main{padding-top:94px}.project-page .site-header nav{position:static;transform:none}
+/* Full-colour ambient halo, with the crisp outline layer disabled. */
+.work-tile::before,body[data-active-work=ferry] .work-tile::before{top:0;left:0;right:0;bottom:auto;height:var(--visual-height,calc(100% - 84px));background:conic-gradient(from var(--glow-angle,0deg),#e99aff,#8466ff 17%,#53a5ff 33%,#70e6df 48%,#ffca8c 66%,#ff76b8 82%,#e99aff);filter:blur(22px);border-radius:14px;opacity:0;transition:opacity .35s;animation:none;pointer-events:none}
+.work-tile:hover::before,.work-tile:focus-visible::before,body[data-active-work=ferry] .work-tile:hover::before,body[data-active-work=ferry] .work-tile:focus-visible::before{opacity:.8;animation:glow-turn 6s linear infinite}
+.tile-visual::after{content:none}.work-tile:hover .tile-visual,.work-tile:focus-visible .tile-visual{border-color:transparent}
+.float-work{isolation:isolate}.float-work::before{content:'';position:absolute;inset:0;z-index:-1;border-radius:12px;filter:blur(22px);background:conic-gradient(from var(--glow-angle,0deg),#e99aff,#8466ff,#53a5ff,#70e6df,#ffca8c,#ff76b8,#e99aff);opacity:0;transition:opacity .35s;pointer-events:none}
+.float-work:hover::before,.float-work:focus-visible::before{opacity:.7;animation:glow-turn 6s linear infinite}
+/* Native, pixel-edged cursor: immediate response, no canvas or trailing fog. */
+@media(hover:hover) and (pointer:fine){body,body.fog-ready{cursor:url('cursor.svg') 10 10,crosshair}a,button,body.fog-ready a,body.fog-ready button{cursor:url('cursor-link.svg') 10 10,pointer}input,textarea{cursor:text}}
+@media(max-width:850px){.site-header,.project-page .site-header{inset:12px 16px auto;width:calc(100% - 32px);padding:0 18px}.header-practice{display:none}.site-header nav{position:static;transform:none}.introduction h1{font-size:calc(var(--mobile-title,6.2vw) + 8px)}}
+@media(max-width:580px){
+ :root{--mobile-title:7.6vw}:root[data-type=newsreader]{--mobile-title:6.5vw}:root[data-type=fraunces]{--mobile-title:6.3vw}
+ .site-header,.project-page .site-header{inset:10px 10px auto;width:calc(100% - 20px);height:50px;padding:0 12px;border-radius:15px}.site-header .wordmark{font-size:12px}.site-header nav{gap:0;font-size:10px}.site-header nav a,.site-header nav button{padding:10px 7px}.site-header nav{right:auto;left:auto;top:auto}
+ .introduction h1{font-size:calc(var(--mobile-title) + 4px);line-height:1.12;letter-spacing:-.04em}.second-line{font-size:.94em;margin-top:10px}.intro-bio{max-width:290px;margin-top:20px}.project-page main{padding-top:75px}
+}
+@media(prefers-reduced-motion:reduce){.work-tile::before,.tile-visual::after,.float-work::before{animation:none!important}.site-header{transition:none}}
+@supports not (backdrop-filter:blur(1px)){.site-header,.site-header.is-scrolled{background:#202020f5}}
+
+/* Reference-led charcoal capsule with a visibly inset selected segment. */
+.site-header,.site-header.is-scrolled,.project-page .site-header{width:min(940px,calc(100% - 48px));height:58px;padding:0 22px;background:transparent;backdrop-filter:none;-webkit-backdrop-filter:none;border:1px solid transparent;border-radius:999px;box-shadow:0 5px 18px #0003}
+.glass-lens{position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:-1;background:linear-gradient(140deg,#ffffff19,#ffffff07 40%,#dceaff10),#080b101f;backdrop-filter:blur(1px) saturate(135%);-webkit-backdrop-filter:blur(1px) saturate(135%)}
+.site-header.refractive .glass-lens{backdrop-filter:url('#liquid-lens') blur(.65px) saturate(135%);-webkit-backdrop-filter:url('#liquid-lens') blur(.65px) saturate(135%)}
+.site-header::before{inset:0;z-index:0;border-radius:inherit;background:radial-gradient(ellipse 210px 60px at var(--glass-x,30%) var(--glass-y,0%),#ffffff29,transparent 90%);opacity:.7;filter:none}
+.site-header::after{content:'';position:absolute;inset:-1px;pointer-events:none;border:0;border-radius:inherit;mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);mask-composite:exclude;box-shadow:none;background:linear-gradient(var(--glass-angle,100deg),#ffffffe0,#ffffff08 22%,#ffffff05 62%,#ffffff6b 90%,#ffffff10);padding:1px}
+.site-header>.wordmark,.site-header>nav,.site-header>.header-practice{z-index:2;color:#f4f4f4;text-shadow:0 1px 2px #000,0 0 5px #000,0 0 12px #000b;background:transparent;border-radius:0}
+.site-header>.wordmark,.site-header>.header-practice{position:relative;padding:0;margin:0}
+.site-header>nav::before,.site-header>.wordmark::before,.site-header>.header-practice::before{content:none}
+.site-header nav{gap:3px}
+.site-header nav a,.site-header nav button{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:10px 19px;border:1px solid transparent;border-radius:999px;color:#d8d8d8;opacity:1;letter-spacing:.005em;transition:background .22s,color .22s,box-shadow .22s}
+.site-header nav a:hover,.site-header nav button:hover{color:#ececec;background:#ffffff10;box-shadow:inset 0 1px 0 #ffffff20}
+.site-header nav .is-active,.site-header nav .is-active:hover{color:#f6f6f6;background:linear-gradient(160deg,#ffffff38,#ffffff18),#1c20283b;border-color:#ffffff36;box-shadow:inset 0 1px 2px #ffffff14,inset 0 -1px 2px #0004,0 0 0 2px #ffffff07;font-weight:500}
+.header-practice{color:#939393}
+@media(max-width:850px){.site-header,.project-page .site-header{width:calc(100% - 32px);padding:0 18px}}
+@media(max-width:580px){.site-header,.project-page .site-header{width:calc(100% - 20px);height:50px;padding:0 13px}.site-header nav{gap:1px}.site-header nav a,.site-header nav button{min-height:36px;padding:8px 8px}}
+
+@supports not (backdrop-filter:blur(1px)){.site-header,.site-header.is-scrolled{background:#1b1e24e8}}
+
+.site-header nav a,.site-header nav button{text-shadow:0 1px 2px #000,0 0 3px #000,0 0 7px #000,0 0 12px #000b}

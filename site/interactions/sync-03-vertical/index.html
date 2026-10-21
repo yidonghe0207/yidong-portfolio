@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>sync — vertical study</title>
+<style>*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;background:#191b1b;color:#f5f4ef;font-family:Arial,sans-serif}canvas{display:block;width:100%;height:100svh;min-height:320px;touch-action:none}footer{position:fixed;bottom:38px;left:32px;right:32px;display:flex;align-items:center;justify-content:space-between;gap:16px;font-size:11px;letter-spacing:.06em;color:#a1a5a2}button{background:none;border:0;color:inherit;font:inherit;letter-spacing:inherit;cursor:pointer;padding:12px 0 12px 12px}button:hover{color:white}button:focus-visible,canvas:focus-visible{outline:1px solid #f5f4ef;outline-offset:-5px}.dots{display:flex;gap:8px}.dots i{width:3px;height:3px;border-radius:50%;background:#505553;transition:background .6s}</style></head>
+<body><canvas tabindex="0" role="img" aria-label="Interactive sync wordmark. Hover or touch all four regions of the line. Or press Enter four times, then R to replay."></canvas><footer><span id="caption" aria-live="polite">Move down the line.</span><span class="dots" aria-hidden="true"><i></i><i></i><i></i><i></i></span><button id="replay">Replay ↗</button></footer><script>
+/** Dependency-free canvas animation. Returns cleanup/replay methods for any host. */
+function createSync(canvas, onStatus = () => {}) {
+  const ctx = canvas.getContext('2d');
+  if (!ctx) throw new Error('A 2D canvas is required.');
+  const TAU = Math.PI * 2;
+  const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+  const mix = (a, b, t) => a + (b - a) * t;
+  const ease = t => { t = clamp(t); return t * t * t * (10 + t * (-15 + 6 * t)); };
+  // Center-line paths traced from the supplied wordmark, in its original coordinates.
+  // Multiple strokes are sampled separately, so y and n never gain false connectors.
+  const paths = [
+    ['M144 100 C135 78 103 80 95 97 C81 126 116 127 129 133 C160 146 148 177 119 177 C103 177 93 171 90 159'],
+    ['M162 87 L199 176', 'M237 87 L183 214'],
+    ['M259 176 L259 87', 'M259 127 C259 72 332 70 332 125 L332 176'],
+    ['M434 97 C405 69 357 90 357 131 C357 170 400 193 434 165'],
+  ];
+  const glyphCenters = [119, 200, 295, 395];
+  const vertical = true;
+  // Four adjoining regions form ONE continuous line before the letter morph.
+  const boundaries = vertical ? [-110, 30, 170, 310, 450] : [82, 157, 246, 347, 441];
+  const centers = boundaries.slice(0, 4).map((v, i) => (v + boundaries[i + 1]) / 2);
+  const targets = paths.map((strokes, letterIndex) => strokes.map(d => {
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', d);
+    const length = path.getTotalLength();
+    return Array.from({length: 96}, (_, j) => {
+      const p = path.getPointAtLength(j / 95 * length);
+      return vertical
+        ? {x: p.x - glyphCenters[letterIndex] + 262, y: p.y - 84 - 100 + letterIndex * 140}
+        : {x: p.x, y: p.y};
+    });
+  }));
+  const motionQuery = matchMedia('(prefers-reduced-motion: reduce)');
+  let reduced = motionQuery.matches;
+  let letters, phase, syncAt, time = 0, last = 0, raf = 0;
+  let width = 1, height = 1, scale = 1, ox = 0, oy = 0;
+  let pointer = {x: 260, y: 130, inside: false};
+  let nextTrace = 0;
+  let traces = [];
+  function status() {
+    onStatus({phase, visited: letters.map(l => l.visited), count: letters.filter(l => l.visited).length});
+  }
+  function replay() {
+    letters = centers.map((_, i) => ({visited: false, energy: 0, phase: i * 1.7,
+      frequency: 1.8 + i * .27, lean: 0, bend: 0, lockOffset: 0}));
+    phase = 'explore'; syncAt = null; traces = []; nextTrace = 0;
+    status();
+  }
+  function resize() {
+    const box = canvas.getBoundingClientRect();
+    width = Math.max(1, box.width); height = Math.max(1, box.height);
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.round(width * dpr); canvas.height = Math.round(height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    scale = vertical ? Math.min(width / 260, height / 720, 2.3) : Math.min(width / 560, height / 340, 2.3);
+    ox = width / 2 - 262 * scale; oy = height / 2 - (vertical ? 170 : 146) * scale;
+  }
+  function activate(i) {
+    if (phase !== 'explore' || letters[i].visited) return;
+    letters[i].visited = true;
+    if (letters.every(l => l.visited)) {
+      phase = 'synchronizing'; syncAt = time;
+      letters.forEach(l => {
+        const difference = time * (l.frequency - 2.15) + l.phase;
+        l.lockOffset = Math.atan2(Math.sin(difference), Math.cos(difference));
+      });
+    }
+    status();
+  }
+  function move(event) {
+    const box = canvas.getBoundingClientRect();
+    pointer = {x: (event.clientX - box.left - ox) / scale,
+      y: (event.clientY - box.top - oy) / scale, inside: true};
+    const along = vertical ? pointer.y : pointer.x;
+    const perpendicular = vertical ? pointer.x - 262 : pointer.y - 131;
+    if (Math.abs(perpendicular) > 80 || along < boundaries[0] || along > boundaries[4]) return;
+    const index = Math.min(3, boundaries.findIndex((edge, i) => i > 0 && along < edge) - 1);
+    activate(index < 0 ? 3 : index);
+  }
+  function leave() { pointer.inside = false; }
+  function key(event) {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      if (phase === 'settled') replay();
+      else { const i = letters.findIndex(l => !l.visited); if (i >= 0) activate(i); }
+    }
+    if (event.key.toLowerCase() === 'r') replay();
+  }
+  function stroke(points, alpha, lineWidth) {
+    ctx.globalAlpha = alpha;
+    ctx.lineWidth = lineWidth;
+    ctx.beginPath();
+    points.forEach((p, i) => i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y));
+    ctx.stroke();
+  }
+  function draw(now) {
+    const dt = last ? Math.min((now - last) / 1000, .05) : 0;
+    last = now; time += dt;
+    const elapsed = syncAt === null ? 0 : time - syncAt;
+    const sync = syncAt === null ? 0 : ease(elapsed / 3.2);
+    const morph = syncAt === null ? 0 : ease((elapsed - 3.7) / 3.1);
+    if (phase === 'synchronizing' && elapsed >= (reduced ? .15 : 3.7)) { phase = 'forming'; status(); }
+    if (phase === 'forming' && elapsed >= (reduced ? .3 : 6.8)) { phase = 'settled'; status(); }
+    const shape = reduced && phase === 'settled' ? 1 : morph;
+    const geometry = [];
+    letters.forEach((letter, i) => {
+      const follow = 1 - Math.exp(-dt * 5);
+      letter.energy = mix(letter.energy, letter.visited ? 1 : 0, follow);
+      const along = vertical ? pointer.y : pointer.x;
+      const perpendicular = vertical ? pointer.x - 262 : pointer.y - 131;
+      const near = pointer.inside ? Math.exp(-Math.pow((along - centers[i]) / 120, 2)) : 0;
+      letter.lean = mix(letter.lean, clamp(perpendicular * .5, -40, 40) * near, follow);
+      letter.bend = mix(letter.bend, clamp((along - centers[i]) / 75, -1, 1) * near, follow);
+      // Oscillators converge in frequency AND phase, then hold a shared rhythm.
+      const common = time * 2.15;
+      const independent = time * letter.frequency + letter.phase;
+      const a = syncAt === null ? independent : common + letter.lockOffset * (1 - sync);
+      geometry.push(targets[i].map(target => target.map((p, j) => {
+        const u = j / (target.length - 1);
+        const envelope = Math.pow(Math.sin(Math.PI * u), 2);
+        const travel = u * TAU * .92;
+        const amplitude = reduced ? 0 : letter.energy * mix(36 + letter.bend * 9, 29, sync);
+        const wave = Math.sin(travel - a) + .23 * Math.sin(travel * 2 - a * 1.3) * (1 - sync);
+        const displacement = reduced ? 0 : envelope * (wave * amplitude + letter.lean * letter.energy * (1 - sync));
+        const along = mix(boundaries[i], boundaries[i + 1], u);
+        const x = vertical ? 262 + displacement : along;
+        const y = vertical ? along : 131 + displacement;
+        return {x: mix(x, p.x, shape), y: mix(y, p.y, shape)};
+      })));
+    });
+    // Store actual historical curves, not blurred frame copies. Crisp, slowly fading ink.
+    if (!reduced && phase !== 'settled' && time >= nextTrace) {
+      geometry.forEach((strokes, i) => {
+        if (letters[i].energy > .03) traces.push({at: time, strokes: shape === 0 ? strokes.slice(0, 1) : strokes});
+      });
+      nextTrace = time + .055;
+    }
+    traces = traces.filter(trace => time - trace.at < 2.6);
+    ctx.clearRect(0, 0, width, height);
+    ctx.save(); ctx.translate(ox, oy); ctx.scale(scale, scale);
+    ctx.strokeStyle = '#f5f4ef'; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    traces.forEach(trace => {
+      const fade = Math.pow(1 - (time - trace.at) / 2.6, 1.8);
+      trace.strokes.forEach(points => stroke(points, .22 * fade * (1 - shape * .7), .55));
+    });
+    if (shape === 0) {
+      stroke(geometry.flatMap(strokes => strokes[0]), .88, .95);
+    } else geometry.forEach((strokes, i) => {
+      strokes.forEach((points, j) => {
+        // At rest overlapping strokes should read as one hairline.
+        if (j && shape === 0) return;
+        stroke(points, letters[i].visited ? .94 : .65, mix(.95, 2.1, shape));
+      });
+    });
+    ctx.restore(); ctx.globalAlpha = 1;
+    raf = requestAnimationFrame(draw);
+  }
+  function preference(event) { reduced = event.matches; traces = []; }
+  replay(); resize();
+  const observer = new ResizeObserver(resize); observer.observe(canvas);
+  canvas.addEventListener('pointermove', move);
+  canvas.addEventListener('pointerdown', move);
+  canvas.addEventListener('pointerleave', leave);
+  canvas.addEventListener('pointercancel', leave);
+  canvas.addEventListener('keydown', key);
+  motionQuery.addEventListener('change', preference);
+  raf = requestAnimationFrame(draw);
+  return {replay, destroy() {
+    cancelAnimationFrame(raf); observer.disconnect();
+    canvas.removeEventListener('pointermove', move);
+    canvas.removeEventListener('pointerdown', move);
+    canvas.removeEventListener('pointerleave', leave);
+    canvas.removeEventListener('pointercancel', leave);
+    canvas.removeEventListener('keydown', key);
+    motionQuery.removeEventListener('change', preference);
+  }};
+}
+
+const animation=createSync(document.querySelector('canvas'),s=>{
+ document.body.dataset.phase=s.phase;
+ document.body.dataset.count=s.count;
+ document.querySelector('#caption').textContent={explore:'Move down the line.',synchronizing:'Finding a shared rhythm.',forming:'Coming together.',settled:'In sync.'}[s.phase];
+ document.querySelectorAll('.dots i').forEach((dot,i)=>dot.style.background=s.visited[i]?'#f5f4ef':'#505553');
+});
+document.querySelector('#replay').onclick=()=>animation.replay();
+</script><script src="../embed.js"></script></body></html>

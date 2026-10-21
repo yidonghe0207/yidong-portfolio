@@ -1,0 +1,16 @@
+@font-face {
+  font-family: 'Gasoek One';
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url('./gasoek-one.ttf') format('truetype');
+}
+/* The five layout utilities used by the exported App.tsx, hosted offline. */
+*, ::before, ::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { line-height: 1.5; -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: white; }
+.min-h-screen { min-height: 100vh; }
+.bg-white { background-color: white; }
+.flex { display: flex; }
+.items-center { align-items: center; }
+.justify-center { justify-content: center; }

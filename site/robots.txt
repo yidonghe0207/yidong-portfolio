@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+Disallow: /interactions/
+Sitemap: https://yidonghe.com/sitemap.xml

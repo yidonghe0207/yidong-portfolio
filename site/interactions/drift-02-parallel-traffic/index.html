@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>drift — parallel play</title><link rel="icon" href="data:,"><style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#fafaf8;color:#171715;font-family:Arial,Helvetica,sans-serif}canvas,#traffic{position:absolute;inset:0;width:100%;height:100%}#traffic{overflow:hidden}.car{position:absolute;left:0;top:0;padding:0;border:0;background:none;cursor:pointer;will-change:transform;color:#121211;touch-action:manipulation}.car svg{display:block;width:100%;height:100%;overflow:visible;fill:currentColor}.car:focus-visible{outline:1px dashed #555;outline-offset:9px}.car:hover{color:#48483f}header,footer{position:fixed;left:32px;right:32px;display:flex;justify-content:flex-end;align-items:center;pointer-events:none;z-index:2}header{top:28px}footer{bottom:26px;font:10px monospace;letter-spacing:.08em;color:#72726c}.label{font:10px monospace;letter-spacing:.13em}.label span{color:#8b8b83;margin-left:20px}nav{display:flex;gap:8px;pointer-events:auto}nav button{font:10px monospace;border:1px solid #deded7;border-radius:25px;padding:9px 14px;background:#fafaf8e8;color:#55554c;cursor:pointer}nav button:hover{border-color:#777}#status{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}@media(max-width:600px){header,footer{left:18px;right:18px}header{top:18px}.label span,#counter{display:none}footer{bottom:20px;font-size:9px}.label{font-size:9px}nav button{padding:8px 10px}}
+</style></head><body><canvas id="traces" aria-hidden="true"></canvas><main id="traffic" aria-label="Moving drift words. Hover a word to drift. On touch, tap. With a keyboard, focus and press Enter."></main><header><nav><button id="pause">Pause</button><button id="reset">Reset</button></nav></header>
+<script>
+(() => {
+  'use strict';
+  const LETTERS = {"angle":-34.11447294534126,"width":205,"glyphs":[{"path":"M22,-28.5L33,-22.5L34,-18.5L2,29.5L-2,29.5L-11,22.5L-16,22.5L-20,29.5L-23,29.5L-33,22.5L-32,18.5L-12,-9.5L-4,-3.5L4,-1.5L22,-28.5ZM-1,6.5L-2,1.5L-11,14.5L-11,19.5L-1,6.5Z","x":16.117707409990594,"y":27.676891291695355,"ix":33,"iy":36.5},{"path":"M-6.5,-19L5.5,-11L10.5,-11L16.5,-19L27.5,-12L27.5,-9L18.5,4L14.5,4L5.5,-2L4.5,-8L-12.5,18L-17.5,20L-26.5,14L-26.5,10L-6.5,-19Z","x":56.6499289197136,"y":38.5466624861712,"ix":69.5,"iy":46},{"path":"M0,-11.5L9,-6.5L12,-1.5L-7,26.5L-11,27.5L-19,22.5L-21,18.5L0,-11.5ZM10,-26.5L22,-19.5L21,-14.5L18,-12.5L15,-6.5L3,-13.5L4,-18.5L10,-26.5Z","x":87.4340755252998,"y":35.71571470579174,"ix":106,"iy":38.5},{"path":"M0.5,-28.5L11.5,-21.5L17.5,-21.5L20.5,-27.5L23.5,-28.5L34.5,-19.5L24.5,-5.5L21.5,-5.5L14.5,-10.5L12.5,-12.5L12.5,-17.5L10.5,-17.5L1.5,-4.5L1.5,0.5L9.5,-9.5L19.5,-3.5L21.5,-0.5L14.5,10.5L11.5,10.5L2.5,3.5L-3.5,3.5L-18.5,27.5L-23.5,29.5L-33.5,21.5L0.5,-28.5Z","x":118.36511093081134,"y":27.396467219110598,"ix":139.5,"iy":36.5},{"path":"M3.5,-26.5L6.5,-26.5L16.5,-19.5L16.5,-16.5L8.5,-6.5L8.5,-2.5L10.5,-2.5L16.5,-11.5L26.5,-5.5L27.5,-0.5L24.5,1.5L21.5,7.5L16.5,6.5L9.5,0.5L4.5,0.5L1.5,3.5L-4.5,12.5L-4.5,17.5L5.5,3.5L10.5,4.5L18.5,10.5L8.5,27.5L4.5,27.5L-4.5,20.5L-9.5,20.5L-13.5,27.5L-17.5,27.5L-19.5,24.5L-24.5,22.5L-26.5,18.5L3.5,-26.5Z","x":154.22359789745505,"y":32.417393471104354,"ix":175.5,"iy":38.5}]};
+  const canvas = document.querySelector('#traces'), ctx = canvas.getContext('2d');
+  const traffic = document.querySelector('#traffic'), pause = document.querySelector('#pause');
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  const angle = -Math.PI / 4, ux = Math.cos(angle), uy = Math.sin(angle), nx = -uy, ny = ux;
+  const clamp = (v,a,b) => Math.max(a,Math.min(b,v));
+  const mix = (a,b,t) => a+(b-a)*t;
+  const mod = (a,b) => ((a%b)+b)%b;
+  const paths = LETTERS.glyphs.map(g => new Path2D(g.path));
+  let W,H,time=0,last=0,accumulator=0,paused=reduced.matches,cars=[],lanes=[],traces=[];
+  function layout(){
+    W=innerWidth;H=innerHeight;const d=Math.min(devicePixelRatio||1,2);
+    canvas.width=W*d;canvas.height=H*d;ctx.setTransform(d,0,0,d,0,0);reset();
+  }
+  function reset(){
+    time=0;accumulator=0;cars=[];lanes=[];traces=[];traffic.replaceChildren();
+    const mobile=W<600,maxScale=mobile?.39:.70;
+    // Each lane contains the entire rotated word plus its lateral excursion.
+    // Adjacent envelopes remain disjoint even when every word drifts at once.
+    const pitch=mobile?110:176,spacing=mobile?190:290,span=nx*W+ny*H;
+    const count=mobile?2:3,actualPitch=pitch;
+    for(let index=0;index<count;index++){
+      const center=span/2+(index-(count-1)/2)*actualPitch,margin=180;
+      const lo=Math.max((-margin-nx*center)/ux,(H+margin-ny*center)/uy);
+      const hi=Math.min((W+margin-nx*center)/ux,(-margin-ny*center)/uy);
+      const slots=Math.max(2,Math.ceil((hi-lo)/spacing)),length=slots*spacing;
+      const lane={center,lo,length,progress:0,speed:(mobile?[100,165]:[145,245,190])[index],phase:(index%3)*spacing/3,cars:[]};
+      lanes.push(lane);
+      for(let slot=0;slot<slots;slot++){
+        const scale=(mobile?.21:.25)+Math.random()*(maxScale-(mobile?.21:.25));
+        const el=document.createElement('button');el.className='car';
+        el.setAttribute('aria-label',`Drift word ${cars.length+1}`);
+        el.innerHTML=`<svg viewBox="-10 -10 ${LETTERS.width+20} 90" aria-hidden="true">${LETTERS.glyphs.map(g=>`<path d="${g.path}"/>`).join('')}</svg>`;
+        el.style.width=(LETTERS.width+20)*scale+'px';el.style.height=90*scale+'px';
+        const cruise=lane.speed*(.65+Math.random()*.75);
+        const width=(LETTERS.width+20)*scale,height=90*scale;
+        const limit=Math.max(3,Math.min(mobile?20:36,pitch/2-(width*Math.sin(.6)+height*Math.cos(.6))/2-8));
+        const c={id:cars.length,el,shapes:[...el.querySelectorAll('path')],lane,slot,spacing,scale,travel:slot*spacing+lane.phase,cruise,speed:cruise,radius:Math.hypot(width,height)/2,limit,x:0,y:0,s:0,offset:0,lateralV:0,yaw:0,rot:0,lean:0,active:false,start:0,sample:0,focused:false};
+        el.addEventListener('pointerdown',e=>{if(e.button===0)e.preventDefault()});
+        el.addEventListener('click',()=>activate(c));
+        el.addEventListener('pointerenter',e=>{if(e.pointerType!=='touch')activate(c)});
+        el.addEventListener('focus',()=>c.focused=true);el.addEventListener('blur',()=>c.focused=false);
+        traffic.append(el);cars.push(c);lane.cars.push(c);position(c);render(c);
+      }
+    }
+    updateUI();draw();
+  }
+  function position(c){
+    c.s=c.lane.lo+mod(c.travel,c.lane.length);
+    c.x=ux*c.s+nx*(c.lane.center+c.offset);c.y=uy*c.s+ny*(c.lane.center+c.offset);
+  }
+  function activate(c){
+    if(c.active)return;c.active=true;c.start=time;c.side=c.id%2?1:-1;
+    if(paused&&!reduced.matches)paused=false;
+    if(paused){c.lean=1;render(c)}updateUI();
+  }
+  function updateUI(){
+    pause.textContent=paused?'Play':'Pause';pause.setAttribute('aria-pressed',String(paused));
+  }
+  function render(c){
+    const w=(LETTERS.width+20)*c.scale,h=90*c.scale;
+    c.el.style.transform=`translate(${c.x-w/2}px,${c.y-h/2}px) rotate(${angle+c.rot}rad)`;
+    LETTERS.glyphs.forEach((g,i)=>c.shapes[i].setAttribute('transform',`translate(${mix(g.x,g.ix,c.lean)} ${mix(g.y,g.iy,c.lean)}) rotate(${LETTERS.angle*(1-c.lean)})`));
+    c.el.dataset.state=c.active?'drifting':'parallel';
+  }
+  function step(dt){
+    time+=dt;
+    for(const lane of lanes){
+      // Keyboard selection stops the complete lane, so following words cannot rear-end it.
+      const stopped=lane.cars.some(c=>c.focused&&!c.active);
+      if(!stopped){
+        const ordered=[...lane.cars].sort((a,b)=>mod(a.travel,lane.length)-mod(b.travel,lane.length));
+        for(let i=0;i<ordered.length;i++){
+          const c=ordered[i],leader=ordered[(i+1)%ordered.length];
+          const gap=mod(leader.travel-c.travel,lane.length);
+          const clearance=Math.max(0,gap-c.radius-leader.radius-22);
+          const target=Math.min(c.cruise,Math.max(0,leader.speed+(clearance-36)*.7));
+          c.nextSpeed=Math.min(Math.max(0,c.speed+clamp(target-c.speed,-300*dt,85*dt)),clearance/dt);
+        }
+        for(const c of lane.cars){c.speed=c.nextSpeed;c.travel+=c.speed*dt}
+      }
+      for(const c of lane.cars){
+        if(stopped)continue;
+        if(c.active){
+          const age=time-c.start,grip=age<.85?.8:5.8;
+          // Fixed-step lateral momentum, tire friction, and a restoring lane-keeping force.
+          // The steering pulse starts the slide; inertia and returning grip resolve it.
+          const force=(age<.34?c.side*(W<600?300:520):0)-c.offset*14-c.lateralV*grip;
+          c.lateralV+=clamp(force,-580,580)*dt;c.offset+=c.lateralV*dt;
+          const limit=c.limit;
+          if(Math.abs(c.offset)>limit){c.offset=clamp(c.offset,-limit,limit);if(c.offset*c.lateralV>0)c.lateralV=0}
+          const target=clamp(Math.atan2(c.lateralV,Math.max(40,c.speed))*1.4+c.side*.48*Math.exp(-age*.85),-.60,.60);
+          c.yaw+=((target-c.rot)*42-c.yaw*10)*dt;c.rot=clamp(c.rot+c.yaw*dt,-.60,.60);
+          c.lean+=(1-c.lean)*(1-Math.exp(-dt*12));
+          if(age>3.4&&Math.abs(c.offset)<.15&&Math.abs(c.lateralV)<.4&&Math.abs(c.rot)<.008){c.active=false;updateUI()}
+        }else{c.lean*=Math.exp(-dt*9);c.rot*=Math.exp(-dt*9);c.offset*=Math.exp(-dt*9)}
+        const previous=c.s;position(c);
+        if(c.s<previous-100){c.active=false;c.lean=0;c.rot=0;c.yaw=0;c.offset=0;c.lateralV=0;position(c);updateUI()}
+        c.sample+=dt;
+        if(c.sample>=1/45){
+          c.sample=0;
+          if(c.x>-200&&c.x<W+200&&c.y>-200&&c.y<H+200)
+            traces.push({x:c.x,y:c.y,rot:angle+c.rot,lean:c.lean,scale:c.scale,born:time,life:c.active?2.8:.20,active:c.active});
+        }
+        render(c);
+      }
+    }
+    traces=traces.filter(p=>time-p.born<p.life);
+  }
+  function draw(){
+    ctx.clearRect(0,0,W,H);ctx.fillStyle='#171715';
+    for(const p of traces){
+      const fade=1-(time-p.born)/p.life;
+      ctx.save();ctx.globalAlpha=(p.active?.038:.044)*fade*fade;
+      ctx.translate(p.x,p.y);ctx.rotate(p.rot);ctx.scale(p.scale,p.scale);ctx.translate(-LETTERS.width/2,-35);
+      LETTERS.glyphs.forEach((g,i)=>{
+        ctx.save();ctx.translate(mix(g.x,g.ix,p.lean),mix(g.y,g.iy,p.lean));ctx.rotate(LETTERS.angle*(1-p.lean)*Math.PI/180);ctx.fill(paths[i]);ctx.restore();
+      });ctx.restore();
+    }
+  }
+  function frame(t){
+    const dt=Math.min((t-last)/1000||0,1/30);last=t;
+    if(!paused&&!document.hidden){accumulator+=dt;while(accumulator>=1/120){step(1/120);accumulator-=1/120}}else accumulator=0;
+    draw();requestAnimationFrame(frame);
+  }
+  pause.onclick=()=>{paused=!paused;updateUI()};document.querySelector('#reset').onclick=reset;
+  document.addEventListener('keydown',e=>{if(e.key.toLowerCase()==='r')reset()});
+  reduced.addEventListener('change',()=>{paused=reduced.matches;updateUI()});
+  addEventListener('resize',layout);document.addEventListener('visibilitychange',()=>last=performance.now());
+  window.driftTraffic={snapshot:()=>({time,paused,tracks:traces.filter(t=>t.active).length,traces:traces.length,angle,cars:cars.map(c=>({id:c.id,x:c.x,y:c.y,s:c.s,lane:c.lane.center,speed:c.speed,cruise:c.cruise,offset:c.offset,active:c.active,lean:c.lean,rot:c.rot,width:(LETTERS.width+20)*c.scale,height:90*c.scale,lateralV:c.lateralV,yaw:c.yaw}))})};
+  layout();requestAnimationFrame(frame);
+})();
+
+</script><script src="../embed.js"></script></body></html>
+
+

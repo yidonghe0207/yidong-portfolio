@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="description" content="Hover over 51WORLD to reveal the Earth. Click to hold the view.">
+  <title>51WORLD · Earth Reveal</title>
+  <link rel="preload" href="assets/earth.png" as="image">
+  <link rel="stylesheet" href="earth.css">
+</head>
+<body class="world-demo">
+  <main class="world-stage" aria-label="51WORLD interactive artwork" data-active="false">
+    <img class="world-earth" src="assets/earth.png" alt="" fetchpriority="high" draggable="false">
+    <button class="world-logo" type="button" aria-label="Hold the Earth view" aria-pressed="false" aria-describedby="world-instructions">
+      <svg viewBox="22 22 156 156" aria-hidden="true" focusable="false">
+        <defs>
+          <mask id="world-cutout" maskUnits="userSpaceOnUse" x="22" y="22" width="156" height="156" style="mask-type:luminance">
+            <circle cx="100" cy="100" r="78" fill="white"/>
+            <!-- Silhouette traced from the supplied 51WORLD mark, not a substitute font. -->
+            <path fill="black" d="M62.5 62.5H100.5V74H62.5Z M62.5 78.5C83.6 79.2 100.5 91.4 100.5 107.3C100.5 123.5 84.7 135.5 62.5 136.2V124.7C77 124.1 86.3 117.1 86.3 107.3C86.3 97.8 77.1 90.3 62.5 89.6Z M124.5 62.5H137.5V136.2H124.5Z"/>
+          </mask>
+        </defs>
+        <circle class="world-disc" cx="100" cy="100" r="78" mask="url(#world-cutout)"/>
+      </svg>
+    </button>
+    <p id="world-instructions" class="sr-only">Hover or focus to reveal the Earth. Click, tap, Enter or Space to hold or release the view. Escape resets it.</p>
+    <span class="sr-only" role="status" aria-live="polite" id="world-status"></span>
+  </main>
+  <script src="earth.js"></script>
+  <script src="../embed.js"></script>
+</body>
+</html>

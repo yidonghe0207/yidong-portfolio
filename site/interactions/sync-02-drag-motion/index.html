@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>sync — motion study</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;background:#fff;color:#161616;font-family:Arial,Helvetica,sans-serif}canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}canvas.dragging{cursor:grabbing}header{position:fixed;top:30px;left:36px;right:36px;display:flex;justify-content:space-between;pointer-events:none;font-size:10px;letter-spacing:.17em;text-transform:uppercase}header span:last-child{color:#999}footer{position:fixed;bottom:22px;left:36px;right:26px;display:flex;align-items:center;justify-content:space-between;gap:16px;font-size:11px;color:#858585;pointer-events:none}nav{display:flex;gap:6px;pointer-events:auto}button{border:0;background:transparent;padding:12px 10px;color:#777;font:inherit;cursor:pointer}button:hover{color:#111}button:disabled{opacity:.3;cursor:default}button:focus-visible,canvas:focus-visible{outline:1px solid #aaa;outline-offset:-4px}#hint{line-height:1.6}@media(max-width:600px){header{top:23px;left:22px;right:22px}footer{left:22px;right:12px;bottom:15px;align-items:flex-end}#hint{max-width:150px}nav{gap:0}button{padding:12px 8px}}
+</style>
+</head>
+<body>
+<header><span>sync / motion study</span><span>Click · drag · release</span></header>
+<canvas tabindex="0" aria-label="Interactive sync wordmark. Drag to leave a permanent motion trail. Arrow keys move the word and leave trails. R resets; Z undoes."></canvas>
+<footer><span id="hint" role="status">Drag to leave an impression.</span><nav aria-label="Canvas controls"><button id="undo" disabled>Undo</button><button id="reset">Reset</button><button id="save">Save PNG ↗</button></nav></footer>
+<script>
+(() => {
+  'use strict';
+  const canvas = document.querySelector('canvas'), ctx = canvas.getContext('2d');
+  const ink = document.createElement('canvas'), inkCtx = ink.getContext('2d');
+  const sprite = document.createElement('canvas'), spriteCtx = sprite.getContext('2d');
+  const hint = document.querySelector('#hint'), undoButton = document.querySelector('#undo');
+  // Geometric, curved lowercase letterforms, independent of installed fonts.
+  const letters = [
+    'M65 29 C53 7 15 9 10 34 C4 60 61 54 65 79 C72 110 23 121 5 97',
+    'M91 16 L91 66 C91 120 162 122 162 66 L162 16 M162 66 L162 112 C162 163 117 173 93 145',
+    'M194 111 L194 16 M194 60 C194 1 265 1 265 60 L265 111',
+    'M355 32 C330 1 290 18 290 64 C290 110 333 126 355 95'
+  ].map(d => new Path2D(d));
+  let width, height, scale, dpr, center, position = {x:0,y:0};
+  let gestures = [], active = null, pointerId = null, anchor = null, frame = 0;
+  const copy = p => ({x:p.x,y:p.y});
+  function setupSprite() {
+    const density = scale * dpr;
+    sprite.width = Math.ceil(400*density); sprite.height = Math.ceil(195*density);
+    spriteCtx.setTransform(density,0,0,density,0,0);
+    spriteCtx.translate(22,17); spriteCtx.strokeStyle='#151515';
+    spriteCtx.lineWidth=14; spriteCtx.lineCap='butt'; spriteCtx.lineJoin='round';
+    letters.forEach(path => spriteCtx.stroke(path));
+  }
+  function stamp(context,p,alpha,soft=false) {
+    context.globalAlpha=alpha;
+    context.filter=soft ? `blur(${1.8*scale}px)` : 'none';
+    context.drawImage(sprite,center.x+(p.x-202)*scale,center.y+(p.y-96)*scale,400*scale,195*scale);
+    context.filter='none'; context.globalAlpha=1;
+  }
+  function trace(p) {
+    stamp(inkCtx,p,.043);
+    stamp(inkCtx,p,.018,true);
+  }
+  function redrawInk() {
+    inkCtx.clearRect(0,0,width,height);
+    for(const gesture of gestures) for(const p of gesture.points) trace(p);
+  }
+  function render() {
+    frame=0;
+    ctx.fillStyle='#fff';ctx.fillRect(0,0,width,height);
+    ctx.drawImage(ink,0,0,width,height);
+    stamp(ctx,position,gestures.length ? .16 : .95,gestures.length>0);
+  }
+  function schedule() {if(!frame) frame=requestAnimationFrame(render);}
+  function resize() {
+    const box=canvas.getBoundingClientRect(); width=box.width;height=box.height;
+    dpr=Math.min(devicePixelRatio||1,2);scale=Math.min(width/580,height/370,2.35);
+    center={x:width/2,y:height/2};
+    for(const layer of [canvas,ink]){layer.width=Math.round(width*dpr);layer.height=Math.round(height*dpr);}
+    ctx.setTransform(dpr,0,0,dpr,0,0);inkCtx.setTransform(dpr,0,0,dpr,0,0);
+    setupSprite();redrawInk();schedule();
+  }
+  function status() {
+    undoButton.disabled=!gestures.length;
+    hint.textContent=active ? 'Release to hold the motion.' : gestures.length ? 'Motion held. Drag again to add more.' : 'Drag to leave an impression.';
+  }
+  function begin() {
+    active={start:copy(position),points:[copy(position)]};
+    gestures.push(active);trace(position);status();
+  }
+  function moveTo(target) {
+    // Uniform spatial sampling makes slow drags and fast swipes equally smooth.
+    const last=active.points[active.points.length-1];
+    const distance=Math.hypot(target.x-last.x,target.y-last.y), spacing=4.1;
+    const count=Math.floor(distance/spacing);
+    for(let i=1;i<=count;i++){
+      const t=i*spacing/distance,p={x:last.x+(target.x-last.x)*t,y:last.y+(target.y-last.y)*t};
+      active.points.push(p);trace(p);
+    }
+    position=target;schedule();
+  }
+  function finish() {
+    if(!active)return;
+    if(active.points.length===1 && Math.hypot(position.x-active.start.x,position.y-active.start.y)<1){
+      gestures.pop();position=copy(active.start);redrawInk();
+    } else {active.end=copy(position);}
+    active=null;
+    if(pointerId!==null && canvas.hasPointerCapture(pointerId))canvas.releasePointerCapture(pointerId);
+    pointerId=null;canvas.classList.remove('dragging');status();schedule();
+  }
+  canvas.addEventListener('pointerdown',e=>{
+    if(pointerId!==null || !e.isPrimary || e.button!==0)return;
+    e.preventDefault();canvas.focus({preventScroll:true});pointerId=e.pointerId;
+    anchor={x:e.clientX,y:e.clientY,position:copy(position)};
+    canvas.setPointerCapture(pointerId);canvas.classList.add('dragging');begin();
+  });
+  canvas.addEventListener('pointermove',e=>{
+    if(e.pointerId!==pointerId)return;
+    const samples=e.getCoalescedEvents?.() || [];
+    for(const sample of samples.length ? samples : [e])moveTo({x:anchor.position.x+(sample.clientX-anchor.x)/scale,y:anchor.position.y+(sample.clientY-anchor.y)/scale});
+  });
+  for(const name of ['pointerup','pointercancel','lostpointercapture'])canvas.addEventListener(name,e=>{if(e.pointerId===pointerId)finish();});
+  window.addEventListener('blur',finish);
+  function reset(){finish();gestures=[];position={x:0,y:0};redrawInk();status();schedule();}
+  function undo(){finish();const previous=gestures.pop();if(previous)position=copy(previous.start);redrawInk();status();schedule();}
+  document.querySelector('#reset').onclick=reset;undoButton.onclick=undo;
+  document.querySelector('#save').onclick=()=>{
+    render();canvas.toBlob(blob=>{if(!blob)return;const url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download='sync-motion.png';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});
+  };
+  canvas.addEventListener('keydown',e=>{
+    if(pointerId!==null)return;
+    const offsets={ArrowLeft:[-12,0],ArrowRight:[12,0],ArrowUp:[0,-12],ArrowDown:[0,12]};
+    if(offsets[e.key]){e.preventDefault();begin();const [x,y]=offsets[e.key];moveTo({x:position.x+x,y:position.y+y});finish();}
+    if(e.key.toLowerCase()==='r')reset();if(e.key.toLowerCase()==='z')undo();
+  });
+  new ResizeObserver(resize).observe(canvas);
+})();
+</script>
+<script src="../embed.js"></script></body>
+</html>

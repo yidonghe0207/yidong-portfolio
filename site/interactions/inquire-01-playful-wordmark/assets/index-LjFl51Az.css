@@ -1,0 +1,9 @@
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;min-height:100%;background:#fff;color:#080808}
+main{height:100svh;min-height:240px;display:grid;place-items:center;overflow:hidden}
+.playground{width:100%;display:flex;justify-content:center;align-items:center}
+.word-wrap{display:block;width:min(920px,88vw);position:relative;touch-action:manipulation;padding:0;border:0;background:transparent;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.word-wrap:focus-visible{outline:1px dashed #777;outline-offset:6px;border-radius:20px}
+svg{display:block;width:100%;overflow:visible}
+.hit{position:absolute;top:17%;height:65%;width:12%}
+@media(max-width:600px){.word-wrap{width:94vw}.hit{min-width:44px}}

@@ -1,0 +1,41 @@
+.ferry-case .case-title h1{font-size:clamp(42px,3.5vw,60px)}
+.ferry-hero{position:relative;overflow:hidden;border-radius:7px;background:#18262c}
+.ferry-hero>img{display:block;width:100%;height:auto;max-height:calc(100svh - 290px);object-fit:cover;object-position:50% 55%}
+.ferry-hero>a{position:absolute;right:24px;bottom:24px;display:flex;gap:28px;align-items:center;padding:12px 18px;border:1px solid #ffffff40;border-radius:30px;background:#1119;color:#fff;backdrop-filter:blur(14px);font:400 13px/1.5 var(--sans)}
+.ferry-heading{margin-bottom:36px}
+.ferry-heading p,.ferry-story>p,.ferry-ending p{font:400 16px/1.7 var(--sans);color:var(--secondary-text);margin:18px 0 0}
+.ferry-case cite{font-style:normal}
+.ferry-case h3{font:500 22px/1.35 var(--sans);letter-spacing:-.015em;margin:0}
+.ferry-story+.ferry-story{margin-top:64px}
+.ferry-story>p{margin:12px 0 26px}
+.ferry-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}
+.ferry-figure{min-width:0;margin:0}
+.ferry-image{display:block;position:relative;width:100%;padding:0;border-radius:5px;overflow:hidden;background:#090909;cursor:zoom-in}
+.ferry-image img{display:block;width:100%;height:auto;aspect-ratio:16/10;object-fit:contain}
+.ferry-image>span{position:absolute;bottom:12px;right:14px;font-size:20px;color:#fff;opacity:0;transition:opacity .2s}
+.ferry-image:hover>span,.ferry-image:focus-visible>span{opacity:1}
+.ferry-figure figcaption,.ferry-caption,.ferry-film figcaption{font:400 13px/1.6 var(--sans);color:var(--secondary-text);margin:12px 0 0}
+.ferry-sketches{grid-template-columns:repeat(3,minmax(0,1fr));gap:26px 18px}
+.ferry-sketches .ferry-image img{aspect-ratio:4/3;padding:14px}
+.ferry-caption{margin-top:24px}
+.ferry-details{margin-top:24px;border-top:1px solid var(--hairline)}
+.ferry-details summary{list-style:none;display:flex;justify-content:space-between;align-items:center;gap:20px;padding:18px 0;font:400 13px/1.5 var(--sans);color:var(--secondary-text);cursor:pointer}
+.ferry-details summary::-webkit-details-marker{display:none}
+.ferry-details summary:hover{color:var(--page-text)}
+.ferry-details summary span{font-size:20px;line-height:1}
+.ferry-details[open] summary span{transform:rotate(45deg)}
+.ferry-detail-grid{padding:8px 0 18px}
+.ferry-details>.ferry-figure{max-width:900px;margin:8px auto 18px}
+.ferry-figure video{display:block;width:100%;height:auto;aspect-ratio:197/108;object-fit:contain;border-radius:5px;background:#080808}
+.ferry-film{margin:0}.ferry-film-stage{position:relative;border-radius:6px;overflow:hidden;background:#080808}
+.ferry-film video{display:block;width:100%;height:auto;aspect-ratio:197/108;object-fit:contain}
+.ferry-film figcaption{display:flex;justify-content:space-between;gap:16px}
+.ferry-play{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:flex;align-items:center;gap:12px;padding:15px 24px;border:1px solid #fff6;border-radius:40px;color:#fff;background:#111b;backdrop-filter:blur(12px);font:400 14px/1.5 var(--sans)}
+.ferry-play[hidden]{display:none}
+.ferry-ending{display:grid;grid-template-columns:minmax(0,.7fr) minmax(0,1fr);align-items:center;gap:10%;margin-top:72px;padding-top:56px;border-top:1px solid var(--hairline)}
+.ferry-poster .ferry-image img{aspect-ratio:auto}
+.ferry-ending a{display:inline-flex;gap:28px;margin-top:26px;font-size:14px;border-bottom:1px solid var(--hairline);padding-bottom:8px}
+.ferry-ending .ferry-credit{font-size:13px;margin-top:40px}
+@media(max-width:850px){.ferry-sketches{grid-template-columns:repeat(2,minmax(0,1fr))}.ferry-ending{gap:32px}}
+@media(max-width:580px){.ferry-hero>img{max-height:none;aspect-ratio:4/3;object-position:center}.ferry-hero>a{right:14px;bottom:14px;padding:9px 14px;font-size:12px;gap:14px}.ferry-grid{grid-template-columns:1fr;gap:28px}.ferry-sketches{grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 12px}.ferry-sketches .ferry-image img{padding:6px}.ferry-heading{margin-bottom:28px}.ferry-case h3{font-size:20px}.ferry-story+.ferry-story{margin-top:44px}.ferry-ending{grid-template-columns:1fr;margin-top:44px;padding-top:36px}.ferry-poster{max-width:280px;margin:auto}.ferry-film figcaption{font-size:12px}.ferry-ending .ferry-credit{margin-top:24px}}
+@media(prefers-reduced-motion:reduce){.ferry-image>span{transition:none}}

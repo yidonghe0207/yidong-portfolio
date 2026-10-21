@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#050505"><title>inquire — type anything</title>
+<style>:root { color-scheme: dark; background: #050505; color: #eee; font-family: 'Courier New', monospace; }
+* { box-sizing: border-box; }
+html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; }
+body { background: #050505; }
+#terminal { position: relative; width: 100%; height: 100%; height: 100dvh; overflow: hidden; isolation: isolate; }
+#screen { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.glass { position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(0deg, transparent 0px, transparent 2px, #0002 3px, transparent 4px); box-shadow: inset 0 0 100px 30px #0009; border-radius: 3.5vw / 3vh; }
+#controls { position: absolute; z-index: 2; right: max(28px, env(safe-area-inset-right)); bottom: max(22px, env(safe-area-inset-bottom)); display: flex; align-items: center; gap: 8px; opacity: 0; transition: opacity .4s; font-size: 12px; color: #686868; }
+#controls button { border: 0; background: transparent; padding: 12px 6px; min-height: 44px; color: #aaa; font: inherit; cursor: pointer; }
+#controls button:hover { color: white; }
+#controls button:disabled { color: #686868; cursor: default; }
+#controls button:focus-visible { outline: 1px solid #eee; outline-offset: 2px; color: white; }
+#terminal.awake #controls, #controls:hover, #controls:focus-within { opacity: 1; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+@media (max-width: 600px) { .glass { box-shadow: inset 0 0 50px 10px #0008; } #controls { right: 16px; bottom: max(12px, env(safe-area-inset-bottom)); } }
+@media (prefers-reduced-motion: reduce) { #controls { transition: none; } }
+
+#input {position:absolute;left:20px;top:20px;width:1px;height:1px;opacity:0;padding:0;border:0;font-size:16px;resize:none;}
+#hint {position:absolute;left:20px;bottom:max(22px, env(safe-area-inset-bottom));border:0;background:none;color:#777;font:12px 'Courier New',monospace;padding:12px 0;min-height:44px;cursor:text;}
+#hint:focus-visible {outline:1px solid white;outline-offset:2px;}
+#terminal:has(#input:focus-visible) {box-shadow:inset 0 0 0 1px #333;}
+</style>  <meta property="og:title" content="Figma Make App">
+</head><body><main id="terminal" aria-label="Inquire typing terminal">
+<canvas id="screen" aria-hidden="true"></canvas><div class="glass" aria-hidden="true"></div>
+<label class="sr-only" for="input">Type anything. Every character becomes the next letter of inquire.</label>
+<textarea id="input" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-describedby="instructions"></textarea>
+<p id="instructions" class="sr-only">Your typing produces only inquire, repeating until the screen is full. Backspace erases. Use Clear to start over.</p>
+<button id="hint" type="button" hidden>type anything</button>
+<nav id="controls" aria-label="Terminal controls"><button id="clear" type="button">clear</button><span aria-hidden="true">/</span><button id="fullscreen" type="button">fullscreen</button></nav>
+<span id="status" class="sr-only" role="status" aria-live="polite"></span>
+</main><script>// Bitmap glyphs drawn on an integer grid, including the reference's low q tail.
+const glyphs = {
+  i: ['0011000','0000000','0111000','0011000','0011000','0011000','1111110','0000000'],
+  n: ['0000000','0000000','1111110','1100011','1100011','1100011','1100011','0000000'],
+  q: ['0000000','0000000','0111111','1100011','1100011','0111111','0000011','0000011'],
+  u: ['0000000','0000000','1100011','1100011','1100011','1100011','0111111','0000000'],
+  r: ['0000000','0000000','1101110','1110000','1100000','1100000','1100000','0000000'],
+  e: ['0000000','0000000','0111110','1100011','1111111','1100000','0111110','0000000'],
+};
+const canvas = document.querySelector('#screen');
+const ctx = canvas.getContext('2d');
+const terminal = document.querySelector('#terminal');
+const input = document.querySelector('#input');
+const status = document.querySelector('#status');
+const hint = document.querySelector('#hint');
+const phrase = 'inquire ';
+const sentinel = '\u200b';
+const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+let count = 0, composing = false, ready = false, blink = true, wakeTimer;
+let width, height, scale, inset, advance, lineHeight, columns, rows, capacity;
+
+function resize() {
+  width = terminal.clientWidth;
+  height = terminal.clientHeight;
+  const dpr = Math.min(devicePixelRatio || 1, 2);
+  canvas.width = Math.round(width * dpr);
+  canvas.height = Math.round(height * dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  scale = width < 600 ? 2 : width < 1100 ? 3 : 4;
+  inset = Math.round(Math.max(20, Math.min(width, height) * .04));
+  columns = Math.max(8, Math.floor((width - inset * 2) / (9 * scale) / 8) * 8);
+  advance = (width - inset * 2 - 7 * scale) / (columns - 2);
+  rows = Math.max(1, Math.floor((height - inset * 2 - 8 * scale) / (13 * scale)) + 1);
+  lineHeight = rows > 1 ? (height - inset * 2 - 8 * scale) / (rows - 1) : 13 * scale;
+  capacity = columns * rows - 1;
+  render();
+}
+
+function glyph(char, x, y) {
+  const pixels = glyphs[char];
+  if (!pixels) return;
+  pixels.forEach((row, rowIndex) => {
+    for (let col = 0; col < row.length; col++) {
+      if (row[col] === '1') ctx.fillRect(x + col * scale, y + rowIndex * scale, scale, scale);
+    }
+  });
+}
+
+function render() {
+  ctx.fillStyle = '#050505';
+  ctx.fillRect(0, 0, width, height);
+  ctx.fillStyle = '#ededed';
+  ctx.shadowColor = '#ffffff40';
+  ctx.shadowBlur = scale * 1.2;
+  const visible = Math.min(count, capacity);
+  for (let index = 0; index < visible; index++) {
+    glyph(phrase[index % phrase.length], Math.round(inset + index % columns * advance), Math.round(inset + Math.floor(index / columns) * lineHeight));
+  }
+  if (ready && count < capacity && (blink || reducedMotion)) {
+    ctx.fillRect(Math.round(inset + visible % columns * advance), Math.round(inset + Math.floor(visible / columns) * lineHeight), 7 * scale, 8 * scale);
+  }
+  ctx.shadowBlur = 0;
+  hint.hidden = count > 0 || !ready;
+}
+
+function resetInput() {
+  input.value = sentinel;
+  input.setSelectionRange(1, 1);
+}
+
+function append(amount) {
+  count = Math.min(Math.max(count, 0) + amount, Math.max(count, capacity));
+  ready = true;
+  blink = true;
+  status.textContent = count >= capacity ? 'Screen full. Clear to begin again.' : phrase.repeat(Math.ceil(count / phrase.length)).slice(0, count);
+  render();
+}
+
+function erase() {
+  count = Math.max(0, count - 1);
+  blink = true;
+  resetInput();
+  render();
+}
+
+function consume() {
+  const text = input.value.replaceAll(sentinel, '');
+  if (text) {
+    const segments = new Intl.Segmenter(undefined, {granularity: 'grapheme'}).segment(text);
+    append(Array.from(segments).length);
+  }
+  resetInput();
+}
+
+function focusInput() { input.focus({preventScroll: true}); }
+function wake() {
+  terminal.classList.add('awake');
+  clearTimeout(wakeTimer);
+  wakeTimer = setTimeout(() => terminal.classList.remove('awake'), 2200);
+}
+
+input.addEventListener('compositionstart', () => { composing = true; });
+input.addEventListener('compositionend', () => { composing = false; consume(); });
+input.addEventListener('input', event => {
+  if (!composing && !event.isComposing) consume();
+});
+input.addEventListener('beforeinput', event => {
+  if (!composing && event.inputType.startsWith('delete')) {
+    event.preventDefault();
+    erase();
+  }
+});
+input.addEventListener('paste', event => {
+  if (!event.clipboardData) return;
+  event.preventDefault();
+  const text = event.clipboardData.getData('text/plain');
+  append(Array.from(new Intl.Segmenter(undefined, {granularity: 'grapheme'}).segment(text)).length);
+  resetInput();
+});
+document.addEventListener('keydown', event => {
+  if (event.ctrlKey || event.metaKey || event.altKey || event.isComposing || composing || event.target.closest('button')) return;
+  if (event.key === 'Backspace') {
+    event.preventDefault();
+    erase();
+  } else if (event.key === 'Enter') {
+    event.preventDefault();
+    append(1);
+  } else if (event.target !== input && Array.from(event.key).length === 1) {
+    event.preventDefault();
+    append(1);
+    focusInput();
+  }
+});
+canvas.addEventListener('pointerdown', event => {
+  event.preventDefault();
+  focusInput();
+});
+hint.addEventListener('click', focusInput);
+document.querySelector('#clear').addEventListener('click', () => {
+  count = 0;
+  blink = true;
+  composing = false;
+  resetInput();
+  status.textContent = 'Cleared. Type anything.';
+  render();
+  focusInput();
+});
+document.querySelector('#fullscreen').addEventListener('click', async () => {
+  try {
+    if (document.fullscreenElement) await document.exitFullscreen();
+    else await terminal.requestFullscreen();
+    focusInput();
+  } catch { status.textContent = 'Fullscreen is not available in this browser.'; }
+});
+if (!document.fullscreenEnabled) document.querySelector('#fullscreen').hidden = true;
+document.addEventListener('fullscreenchange', () => {
+  document.querySelector('#fullscreen').textContent = document.fullscreenElement ? 'exit fullscreen' : 'fullscreen';
+});
+terminal.addEventListener('pointermove', wake);
+terminal.addEventListener('pointerdown', wake);
+new ResizeObserver(resize).observe(terminal);
+resetInput();
+resize();
+if (matchMedia('(pointer: fine)').matches) focusInput();
+setTimeout(() => { ready = true; render(); }, 800);
+setInterval(() => {
+  if (document.hidden || count >= capacity || reducedMotion) return;
+  blink = !blink;
+  render();
+}, 530);
+</script><script src="../embed.js"></script></body></html>

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000">
+  <title>Sharp Eye</title>
+  <desc>A quiet, luminous eye centered on charcoal.</desc>
+  <defs>
+    <radialGradient id="iris" cx="32%" cy="25%" r="86%">
+      <stop stop-color="#e0ebd6"/>
+      <stop offset=".5" stop-color="#a9c5b6"/>
+      <stop offset="1" stop-color="#718f9b"/>
+    </radialGradient>
+    <linearGradient id="outline" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#dce7d5"/>
+      <stop offset="1" stop-color="#8ca7a3"/>
+    </linearGradient>
+  </defs>
+  <path fill="#111513" d="M0 0h1600v1000H0z"/>
+  <path d="M580 500Q800 272 1020 500Q800 728 580 500Z" fill="none" stroke="url(#outline)" stroke-width="10" stroke-linejoin="round"/>
+  <circle cx="800" cy="500" r="83" fill="url(#iris)"/>
+  <circle cx="800" cy="500" r="34" fill="#111513"/>
+  <circle cx="823" cy="475" r="9" fill="#f0f5e8" opacity=".9"/>
+</svg>

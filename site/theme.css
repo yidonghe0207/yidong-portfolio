@@ -1,0 +1,31 @@
+/* Theme the portfolio shell; original artwork, videos and embedded studies retain their colours. */
+:root{--page-bg:#050505;--page-text:#f1f0ec;--secondary-text:#aaa9a5;--surface:#141414;--hairline:#303030;--reel-stage:#292929;--browser-bar:#191919;--browser-edge:#ffffff20}
+:root[data-theme=light]{color-scheme:light;--black:#ffffff;--paper:#20211f;--muted:#62635f;--page-bg:#ffffff;--page-text:#20211f;--secondary-text:#62635f;--surface:#ededeb;--hairline:#d5d6d1;--reel-stage:#e5e5e2;--browser-bar:#f7f7f5;--browser-edge:#0000001c}
+body,.hero{background:var(--page-bg);color:var(--page-text)}
+:root[data-theme=light] .work-tile .tile-visual{border:0;background:var(--page-bg)}
+:root[data-theme=light] .recording-image{border:0;background:var(--page-bg)}
+.site-header>nav>.theme-toggle{width:34px;min-width:34px;padding:7px;flex-shrink:0;margin-left:3px;line-height:1;touch-action:manipulation}
+.theme-toggle svg{width:17px;height:17px;display:block;pointer-events:none}
+.theme-toggle:focus-visible{outline:2px solid currentColor;outline-offset:2px}
+:root[data-theme=light] .site-header,:root[data-theme=light] .site-header>.wordmark,:root[data-theme=light] .site-header>nav,:root[data-theme=light] .site-header nav a,:root[data-theme=light] .site-header nav button{color:#262824;text-shadow:none}
+:root[data-theme=light] .site-header>.glass-surface{box-shadow:0 4px 16px #0000000a}
+:root[data-theme=light] .glass-lens{background:linear-gradient(140deg,#ffffffb0,#ffffff70 40%,#e5e9ec65)}
+:root[data-theme=light] .site-header>.glass-surface::after{background:linear-gradient(var(--glass-angle,100deg),#ffffff,#00000012 26%,#00000013 64%,#ffffff)}
+:root[data-theme=light] .site-header nav a:hover,:root[data-theme=light] .site-header nav button:hover{color:#111;background:#00000009;box-shadow:inset 0 1px 0 #fff8}
+:root[data-theme=light] .site-header nav .is-active,:root[data-theme=light] .site-header nav .is-active:hover{color:#171916;background:linear-gradient(160deg,#ffffffcc,#ffffff60);border-color:#ffffffc0;box-shadow:inset 0 1px 2px #fff,0 1px 5px #00000012}
+:root[data-theme=light] :is(.tile-description,.work-grid .tile-description,.playground-source,.play-gesture,.site-footer>span,.project-header .body,.project-header .eyebrow,.project-note,.chapter-heading p,.project-studies p,.info-dialog p,.close-dialog,.case-title span,.case-overview p,.case-facts dt,.process-pair figcaption,.study-filters button,.case-sections a){color:var(--secondary-text)}
+:root[data-theme=light] :is(.playground-section,.site-footer,.project-nav,.case-section,.case-facts>div,.prototype-links){border-color:var(--hairline)}
+:root[data-theme=light] :is(.info-dialog,.recording-dialog,.case-menu summary,.case-sections){color:var(--page-text);background:#fffffff5;border-color:var(--hairline)}
+:root[data-theme=light] :is(.info-dialog,.recording-dialog)::backdrop{background:#3335;backdrop-filter:blur(14px)}
+:root[data-theme=light] .empty-frame{background:#efefec;border-color:var(--hairline)}
+:root[data-theme=light] .study-filters button[aria-pressed=true]{color:var(--page-text);border-color:var(--page-text)}
+:root[data-theme=light] .case-sections a:hover,:root[data-theme=light] .case-sections a[aria-current]{color:#181a17}
+:root[data-theme=light] .case-scroll-rail span{background:#40423e}
+:root[data-theme=light] .project-studies a{background:#eaeae6}
+:root[data-theme=light] .launch-study{border-color:#777}
+:root[data-theme=light] .page-mist{background:radial-gradient(ellipse at var(--mist-x,50%) var(--mist-y,48%),#fff9,transparent 72%),#ffffffd9}
+:root[data-theme=light] :is(a,button):focus-visible{outline-color:#282a25}
+@media(min-width:1101px){:root[data-theme=light] .case-sections{background:none}}
+@media(max-width:580px){.site-header>nav>.theme-toggle{width:28px;min-width:28px;padding:5px;margin-left:0}.theme-toggle svg{width:16px;height:16px}}
+@media(max-width:360px){.site-header>nav>.theme-toggle{width:26px;min-width:26px}}
+@supports not (backdrop-filter:blur(1px)){:root[data-theme=light] .site-header>.glass-surface{background:#eeeeebf5}}
