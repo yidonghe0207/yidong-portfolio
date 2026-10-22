@@ -27,6 +27,22 @@
   const nav=document.querySelector('.site-header nav');if(!nav)return;
   button=document.createElement('button');button.className='theme-toggle';button.type='button';nav.append(button);
   button.addEventListener('click',()=>apply(theme==='dark'?'light':'dark'));apply(theme,false);
+  // Keep both glass capsules on one row; move the same links into a disclosure
+  // on phones, so desktop navigation and its active-page state stay intact.
+  const header=nav.closest('.site-header'),links=[...nav.querySelectorAll('a')],mobile=matchMedia('(max-width:580px)');
+  const toggle=document.createElement('button'),panel=document.createElement('nav');
+  toggle.type='button';toggle.className='mobile-nav-toggle';toggle.textContent='Menu';
+  panel.id='mobile-site-navigation';panel.className='mobile-nav-panel';panel.hidden=true;panel.setAttribute('aria-label','Mobile navigation');
+  toggle.setAttribute('aria-controls',panel.id);toggle.setAttribute('aria-expanded','false');
+  nav.insertBefore(toggle,button);header.append(panel);header.classList.add('mobile-nav-ready');
+  function closeMenu(restoreFocus=false){panel.hidden=true;toggle.setAttribute('aria-expanded','false');if(restoreFocus)toggle.focus();}
+  function arrange(){closeMenu();for(const link of links){if(mobile.matches)panel.append(link);else nav.insertBefore(link,toggle);}}
+  toggle.addEventListener('click',()=>{const open=panel.hidden;panel.hidden=!open;toggle.setAttribute('aria-expanded',String(open));});
+  panel.addEventListener('click',e=>{if(e.target.closest('a'))closeMenu();});
+  document.addEventListener('click',e=>{if(!header.contains(e.target))closeMenu();});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!panel.hidden){closeMenu(true);e.preventDefault();}});
+  header.addEventListener('focusout',e=>{if(!header.contains(e.relatedTarget))closeMenu();});
+  window.addEventListener('pageshow',()=>closeMenu());mobile.addEventListener('change',arrange);arrange();
  });
  document.addEventListener('click',e=>carry(e.target.closest('a[href]')),true);
  // Chromium ignores download attributes for file:// PDFs. Use an on-demand

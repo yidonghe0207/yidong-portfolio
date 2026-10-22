@@ -29,3 +29,18 @@ body,.hero{background:var(--page-bg);color:var(--page-text)}
 @media(max-width:580px){.site-header>nav>.theme-toggle{width:28px;min-width:28px;padding:5px;margin-left:0}.theme-toggle svg{width:16px;height:16px}}
 @media(max-width:360px){.site-header>nav>.theme-toggle{width:26px;min-width:26px}}
 @supports not (backdrop-filter:blur(1px)){:root[data-theme=light] .site-header>.glass-surface{background:#eeeeebf5}}
+
+/* Phone navigation: matching capsules on a single row, with full-size links. */
+.site-header>nav>.mobile-nav-toggle,.site-header>.mobile-nav-panel{display:none}
+@media(max-width:580px){
+ .site-header.mobile-nav-ready,.project-page .site-header.mobile-nav-ready{inset:12px 12px auto;height:44px;align-items:center;flex-direction:row}
+ .site-header.mobile-nav-ready>.wordmark,.site-header.mobile-nav-ready>nav:not(.mobile-nav-panel){height:44px}
+ .site-header.mobile-nav-ready>nav:not(.mobile-nav-panel){position:relative;inset:auto;transform:none;width:auto;padding:3px;gap:0}
+ .site-header.mobile-nav-ready>.header-practice{display:none}
+ .site-header>nav>.mobile-nav-toggle{display:inline-flex;min-height:36px;padding:7px 14px;font:400 12px/1.3 var(--sans)}
+ .site-header.mobile-nav-ready>nav>.theme-toggle{width:36px;min-width:36px;min-height:36px;margin:0;padding:9px}
+ .site-header.mobile-nav-ready>.mobile-nav-panel:not([hidden]){display:flex;position:absolute;inset:52px 0 auto auto;transform:none;width:min(260px,calc(100vw - 24px));height:auto;max-height:calc(100svh - 80px);overflow-y:auto;flex-direction:column;align-items:stretch;gap:2px;padding:8px;border:1px solid var(--hairline);border-radius:18px;background:var(--page-bg);color:var(--page-text);box-shadow:0 12px 32px #0003;pointer-events:auto;text-shadow:none}
+ .site-header.mobile-nav-ready>.mobile-nav-panel>a{display:flex;justify-content:flex-start;align-items:center;min-height:44px;padding:10px 14px;border-radius:10px;font:400 14px/1.4 var(--sans);color:var(--page-text);text-shadow:none}
+ .site-header.mobile-nav-ready>.mobile-nav-panel>a.is-active{background:var(--surface);font-weight:500;box-shadow:none;border-color:transparent}
+ html:has(.mobile-nav-ready){scroll-padding-top:88px}
+}
