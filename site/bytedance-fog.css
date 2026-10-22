@@ -1,5 +1,5 @@
 /* A self-contained artwork; its black canvas is independent of the site theme. */
-@font-face{font-family:'Inter Variable';src:url('fonts/Inter-Variable.ttf') format('truetype');font-weight:100 900;font-style:normal;font-display:swap}
+@font-face{font-family:'Inter Variable';src:url('fonts/Inter-Variable.woff2') format('woff2');font-weight:100 900;font-style:normal;font-display:swap}
 .bytedance-stage{position:relative;display:grid;place-items:center;width:100%;height:100%;background:#000;isolation:isolate;overflow:hidden;container-type:inline-size}
 .bytedance-trigger{position:relative;display:block;width:12%;min-width:92px;max-width:250px;aspect-ratio:470/407;border:0;padding:0;background:transparent;color:#fff;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;isolation:isolate}
 .bytedance-trigger:focus-visible{outline:1px solid #ffffff80;outline-offset:24px;border-radius:2px}
