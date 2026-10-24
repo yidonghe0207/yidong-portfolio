@@ -44,8 +44,43 @@
  bar.addEventListener('pointerleave',()=>{tx=30;ty=0;targetPower=18;start();});
  window.addEventListener('pagehide',()=>{cancelAnimationFrame(raf);raf=0;});
  }
- const name=bar.querySelector('.wordmark'),label=document.createElement('span');label.className='glass-label';label.textContent=name.textContent;name.replaceChildren(label);
+ const name=bar.querySelector('.wordmark'),label=document.createElement('span');
+ const projectTitle=document.body.classList.contains('project-page')?document.querySelector('.case-title h1,.project-header h1'):null;
+ const title=projectTitle?.textContent.trim().replace(/\s+/g,' '),chinese=document.documentElement.lang.startsWith('zh');
+ label.className='glass-label';
+ if(title){
+  name.classList.add('project-home');
+  const arrow=document.createElement('span'),text=document.createElement('span');
+  arrow.className='home-arrow';arrow.textContent='←';arrow.setAttribute('aria-hidden','true');
+  text.className='home-project-name';text.textContent=title;label.append(arrow,text);
+  name.setAttribute('aria-label',chinese?`${title} — 返回首页`:`${title} — Back to home`);
+  name.title=chinese?`${title} · 返回首页`:`${title} · Back to home`;
+ }else label.textContent=name.textContent;
+ name.replaceChildren(label);
  [name,bar.querySelector('nav')].forEach(attachLens);
+ // Carry only capsule width across full-page navigation; the destination keeps
+ // its own localized title, link and responsive layout.
+ const islandKey='yidong-glass-home-journey';let incoming;
+ try{incoming=JSON.parse(sessionStorage.getItem(islandKey));sessionStorage.removeItem(islandKey);}catch{}
+ document.addEventListener('click',event=>{
+  const link=event.target.closest('a[href]');
+  if(!link||event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey||link.hasAttribute('download')||(link.target&&link.target!=='_self'))return;
+  const url=new URL(link.href,location.href);
+  if(url.origin!==location.origin||url.pathname===location.pathname)return;
+  try{sessionStorage.setItem(islandKey,JSON.stringify({path:url.pathname,width:name.getBoundingClientRect().width,time:Date.now()}));}catch{}
+ },true);
+ let morph;
+ function arrive(){
+  if(projectTitle)window.PortfolioNav?.ready();
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+  if(reduced.matches||!incoming||incoming.path!==location.pathname||Date.now()-incoming.time>10000)return;
+  const width=name.getBoundingClientRect().width,from=Math.min(incoming.width,parseFloat(getComputedStyle(name).maxWidth)||incoming.width);
+  if(!Number.isFinite(from)||Math.abs(from-width)<2)return;
+  morph=name.animate([{width:from+'px'},{width:width+'px'}],{duration:520,easing:'cubic-bezier(.22,1,.36,1)'});
+  label.animate([{opacity:0,transform:'translateY(3px)'},{opacity:1,transform:'translateY(0)'}],{duration:360,delay:70,fill:'backwards',easing:'ease-out'});
+ }));}
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',arrive,{once:true});else arrive();
+ window.addEventListener('pagehide',()=>morph?.cancel());
  const update=()=>{bar.classList.toggle('is-scrolled',scrollY>40);selection();};
  window.addEventListener('scroll',update,{passive:true});update();
 

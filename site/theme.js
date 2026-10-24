@@ -34,7 +34,7 @@
   toggle.type='button';toggle.className='mobile-nav-toggle';toggle.textContent='Menu';
   panel.id='mobile-site-navigation';panel.className='mobile-nav-panel';panel.hidden=true;panel.setAttribute('aria-label','Mobile navigation');
   toggle.setAttribute('aria-controls',panel.id);toggle.setAttribute('aria-expanded','false');
-  nav.insertBefore(toggle,button);header.append(panel);header.classList.add('mobile-nav-ready');
+  nav.insertBefore(toggle,nav.querySelector('.language-toggle')||button);header.append(panel);header.classList.add('mobile-nav-ready');
   function closeMenu(restoreFocus=false){panel.hidden=true;toggle.setAttribute('aria-expanded','false');if(restoreFocus)toggle.focus();}
   function arrange(){closeMenu();for(const link of links){if(mobile.matches)panel.append(link);else nav.insertBefore(link,toggle);}}
   toggle.addEventListener('click',()=>{const open=panel.hidden;panel.hidden=!open;toggle.setAttribute('aria-expanded',String(open));});

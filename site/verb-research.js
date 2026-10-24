@@ -1,6 +1,6 @@
 /* Read-only board exports and the featured study. No Figma writes or live dependencies. */
 (()=>{
- const root='../assets/verb-research/';
+ const root=window.PortfolioLocale?window.PortfolioLocale.asset('assets/verb-research/'):'../assets/verb-research/';
  const boards={
   sync:['2-480','Sync — shared timing, copies, rhythm, and the uncertainty of syncing.'],
   tune:['3-903','Tune — adjustment, harmony, refinement, and giving up control.'],

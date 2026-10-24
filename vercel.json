@@ -3,6 +3,418 @@
   "framework": null,
   "outputDirectory": "site",
   "cleanUrls": false,
+  "redirects": [
+    {
+      "source": "/",
+      "destination": "/en/",
+      "permanent": false,
+      "has": [
+        {
+          "type": "cookie",
+          "key": "yidong-language",
+          "value": "en"
+        }
+      ]
+    },
+    {
+      "source": "/",
+      "destination": "/zh/",
+      "permanent": false,
+      "has": [
+        {
+          "type": "cookie",
+          "key": "yidong-language",
+          "value": "zh"
+        }
+      ]
+    },
+    {
+      "source": "/",
+      "destination": "/zh/",
+      "permanent": false,
+      "has": [
+        {
+          "type": "header",
+          "key": "x-vercel-ip-country",
+          "value": "CN"
+        }
+      ]
+    },
+    {
+      "source": "/",
+      "destination": "/en/",
+      "permanent": false
+    },
+    {
+      "source": "/index.html",
+      "destination": "/en/",
+      "permanent": false,
+      "has": [
+        {
+          "type": "cookie",
+          "key": "yidong-language",
+          "value": "en"
+        }
+      ]
+    },
+    {
+      "source": "/index.html",
+      "destination": "/zh/",
+      "permanent": false,
+      "has": [
+        {
+          "type": "cookie",
+          "key": "yidong-language",
+          "value": "zh"
+        }
+      ]
+    },
+    {
+      "source": "/index.html",
+      "destination": "/zh/",
+      "permanent": false,
+      "has": [
+        {
+          "type": "header",
+          "key": "x-vercel-ip-country",
+          "value": "CN"
+        }
+      ]
+    },
+    {
+      "source": "/index.html",
+      "destination": "/en/",
+      "permanent": false
+    },
+    {
+      "source": "/about.html",
+      "destination": "/en/about.html",
+      "permanent": false,
+      "has": [
+        {
+          "type": "cookie",
+          "key": "yidong-language",
+          "value": "en"
+        }
+      ]
+    },
+    {
+      "source": "/about.html",
+      "destination": "/zh/about.html",
+      "permanent": false,
+      "has": [
+        {
+          "type": "cookie",
+          "key": "yidong-language",
+          "value": "zh"
+        }
+      ]
+    },
+    {
+      "source": "/about.html",
+      "destination": "/zh/about.html",
+      "permanent": false,
+      "has": [
+        {
+          "type": "header",
+          "key": "x-vercel-ip-country",
+          "value": "CN"
+        }
+      ]
+    },
+    {
+      "source": "/about.html",
+      "destination": "/en/about.html",
+      "permanent": false
+    },
+    {
+      "source": "/work/bytedance.html",
+      "destination": "/en/work/bytedance.html",
+      "permanent": false,
+      "has": [
+        {
+          "type": "cookie",
+          "key": "yidong-language",
+          "value": "en"
+        }
+      ]
+    },
+    {
+      "source": "/work/bytedance.html",
+      "destination": "/zh/work/bytedance.html",
+      "permanent": false,
+      "has": [
+        {
+          "type": "cookie",
+          "key": "yidong-language",
+          "value": "zh"
+        }
+      ]
+    },
+    {
+      "source": "/work/bytedance.html",
+      "destination": "/zh/work/bytedance.html",
+      "permanent": false,
+      "has": [
+        {
+          "type": "header",
+          "key": "x-vercel-ip-country",
+          "value": "CN"
+        }
+      ]
+    },
+    {
+      "source": "/work/bytedance.html",
+      "destination": "/en/work/bytedance.html",
+      "permanent": false
+    },
+    {
+      "source": "/work/51world.html",
+      "destination": "/en/work/51world.html",
+      "permanent": false,
+      "has": [
+        {
+          "type": "cookie",
+          "key": "yidong-language",
+          "value": "en"
+        }
+      ]
+    },
+    {
+      "source": "/work/51world.html",
+      "destination": "/zh/work/51world.html",
+      "permanent": false,
+      "has": [
+        {
+          "type": "cookie",
+          "key": "yidong-language",
+          "value": "zh"
+        }
+      ]
+    },
+    {
+      "source": "/work/51world.html",
+      "destination": "/zh/work/51world.html",
+      "permanent": false,
+      "has": [
+        {
+          "type": "header",
+          "key": "x-vercel-ip-country",
+          "value": "CN"
+        }
+      ]
+    },
+    {
+      "source": "/work/51world.html",
+      "destination": "/en/work/51world.html",
+      "permanent": false
+    },
+    {
+      "source": "/work/fog.html",
+      "destination": "/en/work/fog.html",
+      "permanent": false,
+      "has": [
+        {
+          "type": "cookie",
+          "key": "yidong-language",
+          "value": "en"
+        }
+      ]
+    },
+    {
+      "source": "/work/fog.html",
+      "destination": "/zh/work/fog.html",
+      "permanent": false,
+      "has": [
+        {
+          "type": "cookie",
+          "key": "yidong-language",
+          "value": "zh"
+        }
+      ]
+    },
+    {
+      "source": "/work/fog.html",
+      "destination": "/zh/work/fog.html",
+      "permanent": false,
+      "has": [
+        {
+          "type": "header",
+          "key": "x-vercel-ip-country",
+          "value": "CN"
+        }
+      ]
+    },
+    {
+      "source": "/work/fog.html",
+      "destination": "/en/work/fog.html",
+      "permanent": false
+    },
+    {
+      "source": "/work/verbs.html",
+      "destination": "/en/work/verbs.html",
+      "permanent": false,
+      "has": [
+        {
+          "type": "cookie",
+          "key": "yidong-language",
+          "value": "en"
+        }
+      ]
+    },
+    {
+      "source": "/work/verbs.html",
+      "destination": "/zh/work/verbs.html",
+      "permanent": false,
+      "has": [
+        {
+          "type": "cookie",
+          "key": "yidong-language",
+          "value": "zh"
+        }
+      ]
+    },
+    {
+      "source": "/work/verbs.html",
+      "destination": "/zh/work/verbs.html",
+      "permanent": false,
+      "has": [
+        {
+          "type": "header",
+          "key": "x-vercel-ip-country",
+          "value": "CN"
+        }
+      ]
+    },
+    {
+      "source": "/work/verbs.html",
+      "destination": "/en/work/verbs.html",
+      "permanent": false
+    },
+    {
+      "source": "/work/verbs-tune.html",
+      "destination": "/en/work/verbs-tune.html",
+      "permanent": false,
+      "has": [
+        {
+          "type": "cookie",
+          "key": "yidong-language",
+          "value": "en"
+        }
+      ]
+    },
+    {
+      "source": "/work/verbs-tune.html",
+      "destination": "/zh/work/verbs-tune.html",
+      "permanent": false,
+      "has": [
+        {
+          "type": "cookie",
+          "key": "yidong-language",
+          "value": "zh"
+        }
+      ]
+    },
+    {
+      "source": "/work/verbs-tune.html",
+      "destination": "/zh/work/verbs-tune.html",
+      "permanent": false,
+      "has": [
+        {
+          "type": "header",
+          "key": "x-vercel-ip-country",
+          "value": "CN"
+        }
+      ]
+    },
+    {
+      "source": "/work/verbs-tune.html",
+      "destination": "/en/work/verbs-tune.html",
+      "permanent": false
+    },
+    {
+      "source": "/work/ferry.html",
+      "destination": "/en/work/ferry.html",
+      "permanent": false,
+      "has": [
+        {
+          "type": "cookie",
+          "key": "yidong-language",
+          "value": "en"
+        }
+      ]
+    },
+    {
+      "source": "/work/ferry.html",
+      "destination": "/zh/work/ferry.html",
+      "permanent": false,
+      "has": [
+        {
+          "type": "cookie",
+          "key": "yidong-language",
+          "value": "zh"
+        }
+      ]
+    },
+    {
+      "source": "/work/ferry.html",
+      "destination": "/zh/work/ferry.html",
+      "permanent": false,
+      "has": [
+        {
+          "type": "header",
+          "key": "x-vercel-ip-country",
+          "value": "CN"
+        }
+      ]
+    },
+    {
+      "source": "/work/ferry.html",
+      "destination": "/en/work/ferry.html",
+      "permanent": false
+    },
+    {
+      "source": "/work/tuneful.html",
+      "destination": "/en/work/tuneful.html",
+      "permanent": false,
+      "has": [
+        {
+          "type": "cookie",
+          "key": "yidong-language",
+          "value": "en"
+        }
+      ]
+    },
+    {
+      "source": "/work/tuneful.html",
+      "destination": "/zh/work/tuneful.html",
+      "permanent": false,
+      "has": [
+        {
+          "type": "cookie",
+          "key": "yidong-language",
+          "value": "zh"
+        }
+      ]
+    },
+    {
+      "source": "/work/tuneful.html",
+      "destination": "/zh/work/tuneful.html",
+      "permanent": false,
+      "has": [
+        {
+          "type": "header",
+          "key": "x-vercel-ip-country",
+          "value": "CN"
+        }
+      ]
+    },
+    {
+      "source": "/work/tuneful.html",
+      "destination": "/en/work/tuneful.html",
+      "permanent": false
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",

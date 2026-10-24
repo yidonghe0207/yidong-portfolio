@@ -1,7 +1,7 @@
 /* Art direction uses the original project outputs. Cropping stays in CSS,
    leaving every source image and live experiment intact. */
 window.projectCover=function(p,asset){
-  if(p.id==='tuneful')return window.TunefulVisuals.cover((document.body.classList.contains('project-page')?'../':'')+'assets/tuneful/');
+  if(p.id==='tuneful')return window.TunefulVisuals.cover(window.PortfolioLocale?window.PortfolioLocale.asset('assets/tuneful/'):(document.body.classList.contains('project-page')?'../':'')+'assets/tuneful/');
   if(p.id==='bytedance')return '<div class="cover cover-bytedance bytedance-stage"></div>';
   if(p.id==='51world')return '<div class="cover cover-51world world-stage" data-active="false"></div>';
   if(p.cover)return `<div class="cover cover-bytedance"><img src="${document.body.classList.contains('project-page')?'../':''}${p.cover}" alt="ByteDance logo in softly glowing blue, lavender and teal on black" loading="lazy"></div>`;

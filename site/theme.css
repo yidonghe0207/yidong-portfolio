@@ -30,7 +30,7 @@ body,.hero{background:var(--page-bg);color:var(--page-text)}
 @media(max-width:360px){.site-header>nav>.theme-toggle{width:26px;min-width:26px}}
 @supports not (backdrop-filter:blur(1px)){:root[data-theme=light] .site-header>.glass-surface{background:#eeeeebf5}}
 
-/* Phone navigation: matching capsules on a single row, with full-size links. */
+/* Phone navigation: a single row, with full-size links. */
 .site-header>nav>.mobile-nav-toggle,.site-header>.mobile-nav-panel{display:none}
 /* Project pages also style direct nav children; closed menus must win that rule. */
 .site-header>.mobile-nav-panel[hidden]{display:none}
@@ -45,4 +45,18 @@ body,.hero{background:var(--page-bg);color:var(--page-text)}
  .site-header.mobile-nav-ready>.mobile-nav-panel>a{display:flex;justify-content:flex-start;align-items:center;min-height:44px;padding:10px 14px;border-radius:10px;font:400 14px/1.4 var(--sans);color:var(--page-text);text-shadow:none}
  .site-header.mobile-nav-ready>.mobile-nav-panel>a.is-active{background:var(--surface);font-weight:500;box-shadow:none;border-color:transparent}
  html:has(.mobile-nav-ready){scroll-padding-top:88px}
+}
+
+/* The same liquid-glass home capsule adapts to the current project. */
+html.nav-arriving body>.site-header{opacity:1}
+html:is(.nav-arriving,.nav-leaving,.nav-revealing) body>.site-header{z-index:160}
+.site-header>.wordmark{min-width:0;max-width:min(360px,40vw);box-sizing:border-box}
+.site-header>nav:not(.mobile-nav-panel){flex-shrink:0}
+.site-header>.wordmark .glass-label{display:flex;align-items:center;gap:9px;min-width:0;white-space:nowrap}
+.home-arrow{flex:none;font-size:16px;line-height:1}
+.home-project-name{min-width:0;overflow:hidden;text-overflow:ellipsis}
+@media(max-width:580px){
+ .site-header.mobile-nav-ready>.wordmark{flex:0 1 auto;max-width:calc(100vw - 180px)}
+ .site-header>.wordmark .glass-label{gap:6px}
+ .site-header>.wordmark.project-home{padding-inline:12px}
 }

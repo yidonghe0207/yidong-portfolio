@@ -1,7 +1,7 @@
 (()=>{
 'use strict';
 const cfg=window.PORTFOLIO,$=s=>document.querySelector(s),reduced=matchMedia('(prefers-reduced-motion: reduce)'),fine=matchMedia('(pointer:fine)');
-const detail=document.body.classList.contains('project-page'),base=detail?'../../prototypes/':'../prototypes/',asset=n=>base+'assets/'+n,href=id=>(detail?'':'work/')+id+'.html';
+const detail=document.body.classList.contains('project-page'),base=window.PortfolioLocale?window.PortfolioLocale.asset('prototypes/'):(detail?'../../prototypes/':'../prototypes/'),asset=n=>base+'assets/'+n,href=id=>window.PortfolioLocale?window.PortfolioLocale.prefix+'work/'+id+'.html':(detail?'':'work/')+id+'.html';
 const hero=$('.hero'),dialog=$('.info-dialog'),grid=$('.work-grid');let paused=reduced.matches||!!navigator.connection?.saveData,heroVisible=!!hero,hoverWork=false,mouseActive=false,raf=0,last=0,colour=0,opacity=0;
 const pointer={x:innerWidth/2,y:innerHeight/2,tx:innerWidth/2,ty:innerHeight/2};
 function media(p,extra=''){const cover=window.projectCover?.(p,asset);if(cover)return cover;return p.video?`<video muted loop playsinline preload="metadata" poster="${asset(p.image)}" ${extra}><source src="${asset(p.video)}" type="video/webm"></video>`:`<img src="${asset(p.image)}" alt="${p.title}" ${extra}>`;}
