@@ -32,6 +32,8 @@ body,.hero{background:var(--page-bg);color:var(--page-text)}
 
 /* Phone navigation: matching capsules on a single row, with full-size links. */
 .site-header>nav>.mobile-nav-toggle,.site-header>.mobile-nav-panel{display:none}
+/* Project pages also style direct nav children; closed menus must win that rule. */
+.site-header>.mobile-nav-panel[hidden]{display:none}
 @media(max-width:580px){
  .site-header.mobile-nav-ready,.project-page .site-header.mobile-nav-ready{inset:12px 12px auto;height:44px;align-items:center;flex-direction:row}
  .site-header.mobile-nav-ready>.wordmark,.site-header.mobile-nav-ready>nav:not(.mobile-nav-panel){height:44px}
